@@ -6,6 +6,7 @@ export default {
       colors: {
         container: "#202022",
         whitePrimary: "#F9FAFC",
+        greyPrimary: "#898787",
       },
     },
   },
