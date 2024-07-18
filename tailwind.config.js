@@ -7,6 +7,8 @@ export default {
         container: "#202022",
         whitePrimary: "#F9FAFC",
         greyPrimary: "#898787",
+        boxGrey: "#EEEEF8",
+        messageText: "#6D6FEC",
       },
     },
   },

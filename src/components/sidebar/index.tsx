@@ -1,5 +1,5 @@
-import Logo from "../assets/chat.png";
-import { AllChatsIcon, LogoutIcon } from "../icons";
+import Logo from "../../assets/chat.png";
+import { AllChatsIcon, LogoutIcon } from "../../icons";
 
 function Sidebar() {
   return (
