@@ -1,17 +1,42 @@
 import { EllipsisHorizontalIcon } from "../../icons";
-import AvatarOne from "../../assets/avatar-1.jpg";
-import AvatarTwo from "../../assets/avatar-2.jpg";
-import AvatarThree from "../../assets/avatar-3.jpg";
+// import AvatarOne from "../../assets/avatar-1.jpg";
+// import AvatarTwo from "../../assets/avatar-2.jpg";
+// import AvatarThree from "../../assets/avatar-3.jpg";
+import { socket } from "../../main";
+import { useCallback, useEffect, useState } from "react";
+import RoomJoinedMessage from "../roomJoinedMessage";
 
 export default function ActiveConversation() {
+  const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
+    []
+  );
+
+  useEffect(() => {
+    const handleMessage = (message: string) => {
+      setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    socket.on("message", handleMessage);
+
+    return () => {
+      socket.off("message", handleMessage);
+    };
+  }, []);
+
+  const handleRemoveMessage = useCallback((index: number) => {
+    setMemberJoinedMessages((prevMessages) => {
+      const newMessages = [...prevMessages];
+      newMessages.splice(index, 1);
+      return newMessages;
+    });
+  }, []);
+
   return (
     <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 overflow-y-scroll">
       <div className="flex justify-between">
         <div className="flex flex-col">
-          <h3 className="font-medium text-lg md:text-xl lg:text-2xl">
-            Design Chat
-          </h3>
-          <p className="text-gray-400 text-xs md:text-sm lg:text-lg">
+          <h3 className="font-medium text-lg md:text-xl">Design Chat</h3>
+          <p className="text-gray-400 text-xs md:text-sm">
             23 members, 10 online
           </p>
         </div>
@@ -21,7 +46,12 @@ export default function ActiveConversation() {
         </div>
       </div>
 
-      <div className="flex flex-col relative">
+      <RoomJoinedMessage
+        messages={memberJoinedMessages}
+        onRemoveMessage={handleRemoveMessage}
+      />
+
+      {/* <div className="flex flex-col relative">
         <div className="mt-4">
           <div className="flex items-end gap-x-2">
             <img
@@ -89,7 +119,7 @@ export default function ActiveConversation() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

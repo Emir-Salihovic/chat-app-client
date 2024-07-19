@@ -4,7 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { io } from "socket.io-client";
 
-const socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
+export const socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
 
 socket.on("connect", () => {
   console.log("Connected to server");
