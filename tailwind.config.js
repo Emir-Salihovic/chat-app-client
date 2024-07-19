@@ -9,6 +9,8 @@ export default {
         greyPrimary: "#898787",
         boxGrey: "#EEEEF8",
         messageText: "#6D6FEC",
+        messageContainerGuest: "#EEEEF8",
+        messageContainerSender: "#7678ED",
       },
     },
   },

@@ -1,6 +1,6 @@
 export default function Conversations() {
   return (
-    <div className="w-[17%] md:w-[30%] h-full p-2">
+    <div className="w-[17%] md:w-[30%] h-full p-2 overflow-y-scroll">
       <div className="bg-boxGrey flex justify-center md:justify-start gap-x-2 p-2 rounded-lg">
         <div className="h-[45px] w-[45px] bg-black text-white rounded-md flex items-center justify-center">
           <p className="text-lg">DC</p>
