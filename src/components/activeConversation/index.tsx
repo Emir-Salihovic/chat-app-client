@@ -13,6 +13,7 @@ export default function ActiveConversation() {
 
   useEffect(() => {
     const handleMessage = (message: string) => {
+      console.log("message", message);
       setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
     };
 
@@ -33,7 +34,7 @@ export default function ActiveConversation() {
 
   return (
     <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 overflow-y-scroll">
-      <div className="flex justify-between">
+      {/* <div className="flex justify-between">
         <div className="flex flex-col">
           <h3 className="font-medium text-lg md:text-xl">Design Chat</h3>
           <p className="text-gray-400 text-xs md:text-sm">
@@ -44,7 +45,7 @@ export default function ActiveConversation() {
         <div className="mt-2">
           <EllipsisHorizontalIcon />
         </div>
-      </div>
+      </div> */}
 
       <RoomJoinedMessage
         messages={memberJoinedMessages}
