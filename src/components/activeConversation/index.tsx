@@ -1,15 +1,30 @@
+import { useParams } from "react-router-dom";
+
 import { EllipsisHorizontalIcon } from "../../icons";
-// import AvatarOne from "../../assets/avatar-1.jpg";
-// import AvatarTwo from "../../assets/avatar-2.jpg";
-// import AvatarThree from "../../assets/avatar-3.jpg";
+import AvatarOne from "../../assets/avatar-1.jpg";
+import AvatarTwo from "../../assets/avatar-2.jpg";
+import AvatarThree from "../../assets/avatar-3.jpg";
 import { socket } from "../../main";
 import { useCallback, useEffect, useState } from "react";
 import RoomJoinedMessage from "../roomJoinedMessage";
+import { useQuery } from "@tanstack/react-query";
+import { fetchSingleRoom } from "../../services/roomService";
 
 export default function ActiveConversation() {
+  const params = useParams();
+  const { data: singleRoomData, refetch: fetchRoom } = useQuery({
+    queryKey: ["single-room"],
+    queryFn: () => fetchSingleRoom(params.roomId as string),
+    enabled: false,
+  });
+
   const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
     []
   );
+
+  useEffect(() => {
+    fetchRoom();
+  }, [params.roomId]);
 
   useEffect(() => {
     const handleMessage = (message: string) => {
@@ -34,9 +49,11 @@ export default function ActiveConversation() {
 
   return (
     <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 overflow-y-scroll">
-      {/* <div className="flex justify-between">
+      <div className="flex justify-between">
         <div className="flex flex-col">
-          <h3 className="font-medium text-lg md:text-xl">Design Chat</h3>
+          <h3 className="font-medium text-lg md:text-xl">
+            {singleRoomData?.room.name}
+          </h3>
           <p className="text-gray-400 text-xs md:text-sm">
             23 members, 10 online
           </p>
@@ -45,14 +62,14 @@ export default function ActiveConversation() {
         <div className="mt-2">
           <EllipsisHorizontalIcon />
         </div>
-      </div> */}
+      </div>
 
       <RoomJoinedMessage
         messages={memberJoinedMessages}
         onRemoveMessage={handleRemoveMessage}
       />
 
-      {/* <div className="flex flex-col relative">
+      <div className="flex flex-col relative">
         <div className="mt-4">
           <div className="flex items-end gap-x-2">
             <img
@@ -120,7 +137,7 @@ export default function ActiveConversation() {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

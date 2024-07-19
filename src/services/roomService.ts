@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const token =
-  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OWE1YWNkNWEwNDNlOGIzYTYxZTg1ZSIsImlhdCI6MTcyMTQwNDI0OCwiZXhwIjoxNzIxNDA3ODQ4fQ.b6wHfFM6CQAI5s2bOQRAiC33oVJ_q_3ruAh4r-CRgRo";
+  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OWE1YWNkNWEwNDNlOGIzYTYxZTg1ZSIsImlhdCI6MTcyMTQxMjM4MiwiZXhwIjoxNzIxNDE1OTgyfQ.lWfdNcp4YlRobw9zOGEA9BgH37SPvO3hTOhfzkSD3L0";
 
 export async function fetchRooms() {
   const response = await axios("http://localhost:8000/api/v1/rooms");

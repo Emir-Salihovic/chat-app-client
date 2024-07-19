@@ -1,4 +1,6 @@
 import ActiveConversation from "./components/activeConversation";
+import { Outlet } from "react-router-dom";
+
 import Conversations from "./components/conversations";
 import Sidebar from "./components/sidebar";
 
@@ -10,7 +12,7 @@ function App() {
       <div className="w-full lg:w-[94%] h-full bg-whitePrimary text-black">
         <div className="flex items-center gap-x-4 h-full overflow-hidden">
           <Conversations />
-          <ActiveConversation />
+          <Outlet />
         </div>
       </div>
     </main>
