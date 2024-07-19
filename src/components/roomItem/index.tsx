@@ -8,7 +8,7 @@ type RoomItemProps = {
   room: any;
 };
 
-const userId = "669a5acd5a043e8b3a61e85e";
+const userId = "6698f8bf35f0398d66655337";
 
 const isRoomJoined = (roomId: string, roomsJoined: any[]) => {
   return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);

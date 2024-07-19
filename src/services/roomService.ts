@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const token =
-  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2OWE1YWNkNWEwNDNlOGIzYTYxZTg1ZSIsImlhdCI6MTcyMTQxMjM4MiwiZXhwIjoxNzIxNDE1OTgyfQ.lWfdNcp4YlRobw9zOGEA9BgH37SPvO3hTOhfzkSD3L0";
+const token = null; //put token here
 
 export async function fetchRooms() {
   const response = await axios("http://localhost:8000/api/v1/rooms");
