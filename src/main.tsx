@@ -11,7 +11,6 @@ import {
 import { io } from "socket.io-client";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ActiveConversation from "./components/activeConversation/index.tsx";
 import AuthLayout from "./components/authLayout/index.tsx";
 import LoginForm from "./components/loginForm/index.tsx";
 import SignupForm from "./components/signupForm/index.tsx";

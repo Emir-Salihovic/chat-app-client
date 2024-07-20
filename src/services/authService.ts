@@ -5,11 +5,19 @@ export type AuthLoginData = {
   password: string;
 };
 
+export type User = {
+  _id: string;
+  username: string;
+};
+
 export async function login(data: AuthLoginData) {
-  console.log("data", data);
   const response = await axios.post(`/users/login`, data, {
     withCredentials: true,
   });
 
+  return response.data;
+}
+export async function whoAmI() {
+  const response = await axios.get(`/users/me`);
   return response.data;
 }

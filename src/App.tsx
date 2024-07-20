@@ -1,4 +1,3 @@
-import ActiveConversation from "./components/activeConversation";
 import { Outlet } from "react-router-dom";
 
 import Conversations from "./components/conversations";
