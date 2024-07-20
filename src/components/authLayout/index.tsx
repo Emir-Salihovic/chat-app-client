@@ -3,13 +3,9 @@ import useAuthStore, { AuthState } from "../../store/authStore";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { whoAmI } from "../../services/authService";
+import ActivityIndicator from "../activityIndicator";
 
 export default function AuthLayout() {
-  const { data: logedInUserData, isLoading } = useQuery({
-    queryKey: ["who-am-i"],
-    queryFn: whoAmI,
-  });
-
   const navigate = useNavigate();
   const authenticated = useAuthStore((state: AuthState) => state.authenticated);
 
@@ -20,6 +16,18 @@ export default function AuthLayout() {
   const setLogedInUser = useAuthStore(
     (state: AuthState) => state.setLogedInUser
   );
+
+  const {
+    data: logedInUserData,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["who-am-i"],
+    queryFn: whoAmI,
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+    retryDelay: 1000,
+  });
 
   useEffect(() => {
     if (logedInUserData?.user) {
@@ -35,11 +43,11 @@ export default function AuthLayout() {
     }
   }, [navigate, authenticated]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading || isFetching) return <ActivityIndicator />;
 
   return (
     <div className="text-black">
-      <Outlet context={{ authenticated }} />
+      <Outlet />
     </div>
   );
 }

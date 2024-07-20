@@ -17,6 +17,11 @@ export async function login(data: AuthLoginData) {
 
   return response.data;
 }
+
+export async function logout() {
+  await axios.post(`/users/logout`);
+}
+
 export async function whoAmI() {
   const response = await axios.get(`/users/me`);
   return response.data;
