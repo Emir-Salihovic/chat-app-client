@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ActiveConversation from "./components/activeConversation/index.tsx";
+import AuthLayout from "./components/authLayout/index.tsx";
 
 export const socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
 
@@ -21,7 +22,7 @@ const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <AuthLayout />,
     children: [
       {
         path: "rooms/:roomId",
