@@ -30,3 +30,8 @@ export async function fetchRoomMembersCount(roomId: string) {
   const response = await axios(`/rooms/count/${roomId}`);
   return response.data;
 }
+
+export async function fetchRoomOnlineMembers(roomId: string) {
+  const response = await axios(`/rooms/online/${roomId}`);
+  return response.data;
+}
