@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 type RoomJoinedMessageProps = {
   messages: string[];
   onRemoveMessage: (messageIndex: number) => void;
+  show?: boolean;
 };
 
 export default function RoomJoinedMessage({
   messages,
   onRemoveMessage,
+  show,
 }: RoomJoinedMessageProps) {
   const [visibleMessages, setVisibleMessages] = useState<string[]>(messages);
 
@@ -34,6 +36,8 @@ export default function RoomJoinedMessage({
       timers.forEach(clearTimeout);
     };
   }, [visibleMessages, onRemoveMessage]);
+
+  if (!show) return;
 
   return (
     visibleMessages.length > 0 && (

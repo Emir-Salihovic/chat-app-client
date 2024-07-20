@@ -25,3 +25,8 @@ export async function fetchSingleRoom(userId: string, roomId: string) {
 
   return response.data;
 }
+
+export async function fetchRoomMembersCount(roomId: string) {
+  const response = await axios(`/rooms/count/${roomId}`);
+  return response.data;
+}

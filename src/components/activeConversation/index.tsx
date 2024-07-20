@@ -5,7 +5,10 @@ import { socket } from "../../main";
 import { useCallback, useEffect, useState } from "react";
 import RoomJoinedMessage from "../roomJoinedMessage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchSingleRoom } from "../../services/roomService";
+import {
+  fetchRoomMembersCount,
+  fetchSingleRoom,
+} from "../../services/roomService";
 import MessageInput from "../messageInput";
 import { instance as axios } from "../../services";
 import useAuthStore, { AuthState } from "../../store/authStore";
@@ -35,9 +38,18 @@ export default function ActiveConversation() {
     },
   });
 
+  const { data: roomMembersCount, refetch: getRoomMembersCount } = useQuery({
+    queryKey: ["room-members-count"],
+    queryFn: () => fetchRoomMembersCount(params?.roomId as string),
+  });
+
   useEffect(() => {
     fetchRoom();
     getMessagesForRoom();
+
+    queryClient.invalidateQueries({
+      queryKey: ["room-members-count"],
+    });
   }, [params.roomId]);
 
   useEffect(() => {
@@ -79,7 +91,7 @@ export default function ActiveConversation() {
             {singleRoomData?.room.name}
           </h3>
           <p className="text-gray-400 text-xs md:text-sm">
-            23 members, 10 online
+            {roomMembersCount?.roomMembersCount} members, 0 online
           </p>
         </div>
 
@@ -91,6 +103,7 @@ export default function ActiveConversation() {
       <RoomJoinedMessage
         messages={memberJoinedMessages}
         onRemoveMessage={handleRemoveMessage}
+        show={singleRoomData?.hasJoinedRoom}
       />
 
       <div className="flex flex-col relative h-full">
