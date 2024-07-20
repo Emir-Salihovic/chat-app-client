@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { SendMessageIcon } from "../../icons";
 import { sendMessage } from "../../services/messageService";
+import useAuthStore, { AuthState } from "../../store/authStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 type MessageInputProps = {
   roomId: string | undefined;
 };
 
 const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
+  const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
+  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
@@ -17,15 +21,19 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
     if (message.trim()) {
       console.log("Send message:", message);
 
-      if (!roomId) return;
+      if (!roomId || !logedInUser?._id) return;
 
-      sendMessage(roomId, message);
+      sendMessage(roomId, logedInUser._id, message);
       setMessage("");
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-messages"],
+      });
     }
   };
 
   return (
-    <div className="flex items-center bg-messageContainerGuest rounded-full px-4 py-2 w-full absolute bottom-3 left-0">
+    <div className="flex items-center bg-messageContainerGuest rounded-full px-4 py-2 w-full sticky bottom-3 left-0">
       <input
         type="text"
         value={message}

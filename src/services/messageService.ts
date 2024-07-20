@@ -1,9 +1,11 @@
 import { instance as axios } from "./index";
 import { socket } from "../main";
 
-const userId = "6698f8bf35f0398d66655337";
-
-export async function sendMessage(roomId: string, message: string) {
+export async function sendMessage(
+  roomId: string,
+  userId: string,
+  message: string
+) {
   socket.emit("messageSent", { userId, roomId, message });
 
   //   const response = await axios.post(

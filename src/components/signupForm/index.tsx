@@ -1,14 +1,38 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/chat.png";
+import { useMutation } from "@tanstack/react-query";
+import { AuthCredentials, signup } from "../../services/authService";
+import useAuthStore, { AuthState } from "../../store/authStore";
 
 const SignupForm: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const setAuthenticated = useAuthStore(
+    (state: AuthState) => state.setAuthenticated
+  );
+
+  const signupMutation = useMutation({
+    mutationFn: (data: AuthCredentials) => signup(data),
+    onError: (error) => {
+      // An error happened!
+      console.error("error", error);
+    },
+    onSuccess: (data) => {
+      console.log("data from signup", data);
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log({ username, password });
+
+    await signupMutation.mutateAsync({ username, password });
+
+    setAuthenticated(true);
+    navigate("/rooms", { replace: true });
   };
 
   return (

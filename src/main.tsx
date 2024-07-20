@@ -15,6 +15,7 @@ import AuthLayout from "./components/authLayout/index.tsx";
 import LoginForm from "./components/loginForm/index.tsx";
 import SignupForm from "./components/signupForm/index.tsx";
 import ProtectedRoute from "./components/protectedRoute/index.ts";
+import ActiveConversation from "./components/activeConversation/index.tsx";
 
 export const socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
 
@@ -49,16 +50,22 @@ const router = createBrowserRouter([
             <App />
           </ProtectedRoute>
         ),
+        children: [
+          {
+            path: ":roomId",
+            element: <ActiveConversation />,
+          },
+        ],
       },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
-    </QueryClientProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+    <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
+  </QueryClientProvider>
+  // </React.StrictMode>
 );

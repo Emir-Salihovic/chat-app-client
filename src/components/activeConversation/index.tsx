@@ -1,65 +1,65 @@
 import { useParams } from "react-router-dom";
 
 import { EllipsisHorizontalIcon } from "../../icons";
-import AvatarOne from "../../assets/avatar-1.jpg";
-// import AvatarTwo from "../../assets/avatar-2.jpg";
-import AvatarThree from "../../assets/avatar-3.jpg";
 import { socket } from "../../main";
 import { useCallback, useEffect, useState } from "react";
 import RoomJoinedMessage from "../roomJoinedMessage";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchSingleRoom } from "../../services/roomService";
 import MessageInput from "../messageInput";
-import axios from "axios";
+import { instance as axios } from "../../services";
+import useAuthStore, { AuthState } from "../../store/authStore";
 
 export default function ActiveConversation() {
+  const queryClient = useQueryClient();
   const params = useParams();
+  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+  const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
+    []
+  );
+
   const { data: singleRoomData, refetch: fetchRoom } = useQuery({
     queryKey: ["single-room"],
-    queryFn: () => fetchSingleRoom(params.roomId as string),
+    queryFn: () =>
+      fetchSingleRoom(logedInUser?._id as string, params.roomId as string),
     enabled: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const { data: roomMessages, refetch: getMessagesForRoom } = useQuery({
     queryKey: ["room-messages"],
     queryFn: async () => {
-      const response = await axios(
-        `http://localhost:8000/api/v1/rooms/messages/${params.roomId}`,
-        {
-          headers: {
-            Authorization: null, //put token here
-          },
-        }
-      );
-
+      const response = await axios(`/rooms/messages/${params.roomId}`);
       return response.data;
     },
   });
 
-  const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
-    []
-  );
-
   useEffect(() => {
     fetchRoom();
+    getMessagesForRoom();
   }, [params.roomId]);
 
   useEffect(() => {
-    const handleMessage = (message: string) => {
+    const handleMemberJoinedMessage = (message: string) => {
       setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
+
+      queryClient.invalidateQueries({
+        queryKey: ["rooms-joined"],
+      });
     };
 
-    function handleReceivedMessage(message: string) {
+    const handleReceivedMessage = (message: string) => {
       console.log("message received", message);
-
       getMessagesForRoom();
-    }
+    };
 
-    socket.on("message", handleMessage);
+    socket.on("message", handleMemberJoinedMessage);
     socket.on("messageReceived", handleReceivedMessage);
 
     return () => {
-      socket.off("message", handleMessage);
+      socket.off("message", handleMemberJoinedMessage);
+      socket.off("messageReceived", handleReceivedMessage);
     };
   }, []);
 
@@ -70,8 +70,6 @@ export default function ActiveConversation() {
       return newMessages;
     });
   }, []);
-
-  const userId = "669a5acd5a043e8b3a61e85e";
 
   return (
     <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 overflow-y-scroll relative">
@@ -95,19 +93,20 @@ export default function ActiveConversation() {
         onRemoveMessage={handleRemoveMessage}
       />
 
-      <div className="flex flex-col relative">
+      <div className="flex flex-col relative h-full">
         {roomMessages?.roomMessages.map((roomMessage: any) => {
           // Ensure the condition is correctly evaluated
-          if (roomMessage.userId._id === userId) {
+          if (roomMessage.userId._id === logedInUser?._id) {
             return (
               <div key={roomMessage._id} className="mt-4 min-h-[70px]">
                 <div className="flex items-end gap-x-2 absolute right-0 lg:right-4 max-w-[100%] lg:max-w-[45%] w-full">
                   <img
-                    src={AvatarThree}
+                    src={logedInUser?.avatar}
                     alt="avatar"
                     className="h-14 w-14 rounded-md"
                   />
                   <div className="max-w-[90%] bg-messageContainerSender p-2 rounded-md text-[#eee] w-full">
+                    <h6 className="font-semibold text-sm md:text-md">You</h6>
                     <p className="text-[10px] md:text-xs font-medium">
                       {roomMessage.message}
                     </p>
@@ -131,7 +130,7 @@ export default function ActiveConversation() {
               <div className="mt-4" key={roomMessage._id}>
                 <div className="flex items-end gap-x-2">
                   <img
-                    src={AvatarOne}
+                    src={roomMessage.userId.avatar}
                     alt="avatar"
                     className="h-14 w-14 rounded-md"
                   />

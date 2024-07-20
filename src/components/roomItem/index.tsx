@@ -1,14 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchJoinedRooms } from "../../services/roomService";
 import { socket } from "../../main";
+import useAuthStore, { AuthState } from "../../store/authStore";
 
 type RoomItemProps = {
   room: any;
 };
-
-const userId = "6698f8bf35f0398d66655337";
 
 const isRoomJoined = (roomId: string, roomsJoined: any[]) => {
   return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);
@@ -16,7 +15,8 @@ const isRoomJoined = (roomId: string, roomsJoined: any[]) => {
 
 export default function RoomItem({ room }: RoomItemProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+
+  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
   const { data: roomsJoined, isLoading: isRoomsJoinedLoading } = useQuery({
     queryKey: ["rooms-joined"],
     queryFn: fetchJoinedRooms,
@@ -25,17 +25,9 @@ export default function RoomItem({ room }: RoomItemProps) {
   const roomInitials = room.name.split("")[0] + room.name.split(" ")[1][0];
   const roomAlreadyJoined = isRoomJoined(room._id, roomsJoined);
 
-  const joinRoom = async (roomId: string) => {
-    socket.emit("joinRoom", { userId, roomId });
-
-    await queryClient.invalidateQueries({
-      queryKey: ["rooms"],
-    });
-
-    await queryClient.invalidateQueries({
-      queryKey: ["rooms-joined"],
-    });
-  };
+  async function joinRoom(roomId: string) {
+    socket.emit("joinRoom", { userId: logedInUser?._id, roomId });
+  }
 
   return (
     <div

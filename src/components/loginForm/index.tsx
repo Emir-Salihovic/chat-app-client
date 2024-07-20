@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { useMutation } from "@tanstack/react-query";
-import { AuthLoginData, login } from "../../services/authService";
+import { AuthCredentials, login } from "../../services/authService";
 
 const LoginForm: React.FC = () => {
   const setAuthenticated = useAuthStore(
@@ -15,7 +15,7 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState("");
 
   const loginMutation = useMutation({
-    mutationFn: (data: AuthLoginData) => login(data),
+    mutationFn: (data: AuthCredentials) => login(data),
     onError: (error) => {
       // An error happened!
       console.error("error", error);

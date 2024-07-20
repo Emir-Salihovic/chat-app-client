@@ -1,11 +1,12 @@
 import { create } from "zustand";
+import { User } from "../services/authService";
 
 export interface AuthState {
   authenticated: boolean;
   setAuthenticated: (value: boolean) => void;
 
   setLogedInUser: (user: any) => void;
-  logedInUser: any;
+  logedInUser: User | null;
 }
 
 const useAuthStore = create<AuthState>()((set) => ({
