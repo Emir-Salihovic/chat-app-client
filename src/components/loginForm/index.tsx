@@ -1,17 +1,23 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
+import useAuthStore, { AuthState } from "../../store/authStore";
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const setAuthenticated = useAuthStore(
+    (state: AuthState) => state.setAuthenticated
+  );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({ username, password });
 
-    navigate("/");
+    setAuthenticated(true);
+    navigate("/rooms", { replace: true });
   };
 
   return (
@@ -74,9 +80,9 @@ const LoginForm: React.FC = () => {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Don’t have an account?{" "}
-            <a href="/create-account" className="text-messageText">
+            <Link to="/signup" className="text-messageText">
               Create account
-            </a>
+            </Link>
           </p>
         </div>
       </div>

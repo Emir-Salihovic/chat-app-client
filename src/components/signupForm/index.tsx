@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 
 const SignupForm: React.FC = () => {
@@ -62,9 +63,9 @@ const SignupForm: React.FC = () => {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
-            <a href="/login" className="text-messageText">
+            <Link to="/login" className="text-messageText">
               Log in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
