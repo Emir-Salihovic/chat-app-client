@@ -9,7 +9,7 @@ function Sidebar() {
           <img src={Logo} alt="Logo" className="h-10" />
         </div>
 
-        <div className="mt-8 h-full relative">
+        <div className="mt-8 h-full relative text-white">
           <div className="flex flex-col items-center gap-y-[3px] cursor-pointer">
             <AllChatsIcon />
             <p className="text-xs font-thin">Chats</p>

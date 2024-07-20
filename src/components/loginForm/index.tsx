@@ -2,19 +2,34 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 import useAuthStore, { AuthState } from "../../store/authStore";
+import { useMutation } from "@tanstack/react-query";
+import { AuthLoginData, login } from "../../services/authService";
 
 const LoginForm: React.FC = () => {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
   const setAuthenticated = useAuthStore(
     (state: AuthState) => state.setAuthenticated
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const loginMutation = useMutation({
+    mutationFn: (data: AuthLoginData) => login(data),
+    onError: (error) => {
+      // An error happened!
+      console.error("error", error);
+    },
+    onSuccess: (data) => {
+      console.log("data from login", data);
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log({ username, password });
+
+    await loginMutation.mutateAsync({ username, password });
 
     setAuthenticated(true);
     navigate("/rooms", { replace: true });
@@ -72,9 +87,10 @@ const LoginForm: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-messageContainerSender text-white py-2 rounded-md hover:bg-purple-700 transition duration-300"
+            disabled={loginMutation.isPending}
+            className="w-full bg-messageContainerSender text-white py-2 rounded-md hover:bg-purple-700 transition duration-300 disabled:bg-gray-400"
           >
-            Sign in
+            {loginMutation.isPending ? "Loading..." : "Sign in"}
           </button>
         </form>
         <div className="text-center mt-4">

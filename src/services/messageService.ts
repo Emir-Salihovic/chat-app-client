@@ -1,7 +1,5 @@
-import axios from "axios";
+import { instance as axios } from "./index";
 import { socket } from "../main";
-
-const token = null; //put token here
 
 const userId = "6698f8bf35f0398d66655337";
 
@@ -30,14 +28,7 @@ export async function sendMessage(roomId: string, message: string) {
 }
 
 export async function getRoomMessages(roomId: string) {
-  const response = await axios(
-    `http://localhost:8000/api/v1/rooms/messages/${roomId}`,
-    {
-      headers: {
-        Authorization: token,
-      },
-    }
-  );
+  const response = await axios(`/rooms/messages/${roomId}`);
 
   return response.data;
 }

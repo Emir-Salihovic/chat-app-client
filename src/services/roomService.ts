@@ -1,26 +1,16 @@
-import axios from "axios";
-
-const token = null; //put token here
+import { instance as axios } from "./index";
 
 export async function fetchRooms() {
-  const response = await axios("http://localhost:8000/api/v1/rooms");
+  const response = await axios("/rooms");
   return response.data;
 }
 
 export async function fetchJoinedRooms() {
-  const response = await axios("http://localhost:8000/api/v1/rooms/joined", {
-    headers: {
-      Authorization: token,
-    },
-  });
+  const response = await axios("/rooms/joined");
   return response.data;
 }
 
 export async function fetchSingleRoom(roomId: string) {
-  const response = await axios(`http://localhost:8000/api/v1/rooms/${roomId}`, {
-    headers: {
-      Authorization: token,
-    },
-  });
+  const response = await axios(`/rooms/${roomId}`);
   return response.data;
 }
