@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 
 import { EllipsisHorizontalIcon } from "../../icons";
 import { socket } from "../../main";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import RoomJoinedMessage from "../roomJoinedMessage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -17,6 +17,8 @@ import useAuthStore, { AuthState } from "../../store/authStore";
 export default function ActiveConversation() {
   const queryClient = useQueryClient();
   const params = useParams();
+  const prevRoomRef = useRef<string>(params?.roomId as string);
+
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
   const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
     []
@@ -31,7 +33,7 @@ export default function ActiveConversation() {
     refetchOnReconnect: false,
   });
 
-  const { data: roomOnlineMembers } = useQuery({
+  const { data: roomOnlineMembers, refetch } = useQuery({
     queryKey: ["room-online-members"],
     queryFn: () => fetchRoomOnlineMembers(params?.roomId as string),
   });
@@ -50,16 +52,34 @@ export default function ActiveConversation() {
   });
 
   useEffect(() => {
+    console.log("room id", prevRoomRef.current);
     fetchRoom();
     getMessagesForRoom();
+
+    const handleUserChangedRoom = (message: string) => {
+      console.log("message user changed room", message);
+      queryClient.invalidateQueries({
+        queryKey: ["room-online-members"],
+      });
+    };
+
+    socket.on("userChangedRoom", handleUserChangedRoom);
 
     queryClient.invalidateQueries({
       queryKey: ["room-members-count"],
     });
 
-    queryClient.invalidateQueries({
-      queryKey: ["room-online-members"],
-    });
+    // Since leaving the room, set the status to offline
+    if (prevRoomRef.current !== params.roomId) {
+      socket.emit("roomChanged", {
+        userId: logedInUser?._id,
+        roomId: prevRoomRef.current,
+      });
+    }
+
+    prevRoomRef.current = params.roomId as string;
+
+    console.log("prev room ref", prevRoomRef.current);
   }, [params.roomId]);
 
   useEffect(() => {
