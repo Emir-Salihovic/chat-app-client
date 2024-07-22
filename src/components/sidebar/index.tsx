@@ -4,9 +4,13 @@ import Logo from "../../assets/chat.png";
 import { AllChatsIcon, LogoutIcon } from "../../icons";
 import { logout } from "../../services/authService";
 import useAuthStore, { AuthState } from "../../store/authStore";
+import { socket } from "../../main";
 
 function Sidebar() {
   const navigate = useNavigate();
+
+  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+
   const setAuthenticated = useAuthStore(
     (state: AuthState) => state.setAuthenticated
   );
@@ -30,6 +34,10 @@ function Sidebar() {
 
   async function handleLogout() {
     await logoutMutation.mutateAsync();
+
+    socket.emit("userLogout", {
+      userId: logedInUser?._id,
+    });
   }
 
   return (

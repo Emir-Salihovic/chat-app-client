@@ -22,11 +22,27 @@ export default function RoomItem({ room }: RoomItemProps) {
     queryFn: fetchJoinedRooms,
   });
 
+  // const leaveRoomMutation = useMutation({
+  //   mutationKey: ["leave-room"],
+  //   mutationFn: leaveRoom,
+  //   onSuccess: (data: any) => {
+  //     console.log('Data after room leaving', data)
+  //   },
+  //   onError: (err: any) => {
+  //     console.error('Error on leaving room', err)
+  //   }
+  // })
+
   const roomInitials = room.name.split("")[0] + room.name.split(" ")[1][0];
   const roomAlreadyJoined = isRoomJoined(room._id, roomsJoined);
 
   async function joinRoom(roomId: string) {
     socket.emit("joinRoom", { userId: logedInUser?._id, roomId });
+  }
+
+  async function leaveRoom(roomId: string) {
+    console.log("leaving room...");
+    socket.emit("leftRoom", { userId: logedInUser?._id, roomId });
   }
 
   return (
@@ -48,12 +64,19 @@ export default function RoomItem({ room }: RoomItemProps) {
         </div>
       </div>
 
-      {!roomAlreadyJoined && !isRoomsJoinedLoading && (
+      {!roomAlreadyJoined && !isRoomsJoinedLoading ? (
         <button
           onClick={() => joinRoom(room._id)}
           className="bg-messageContainerSender text-white text-xs py-1 px-3 inline-block rounded-lg h-[30px]"
         >
           +
+        </button>
+      ) : (
+        <button
+          onClick={() => leaveRoom(room._id)}
+          className="bg-red-500 text-white text-xs py-1 px-3 inline-block rounded-lg h-[30px]"
+        >
+          &times;
         </button>
       )}
     </div>

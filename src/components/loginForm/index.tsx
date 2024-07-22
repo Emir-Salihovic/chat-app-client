@@ -2,10 +2,14 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 import useAuthStore, { AuthState } from "../../store/authStore";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthCredentials, login } from "../../services/authService";
 
 const LoginForm: React.FC = () => {
+  const queryClient = useQueryClient();
+  const setLogedInUser = useAuthStore(
+    (state: AuthState) => state.setLogedInUser
+  );
   const setAuthenticated = useAuthStore(
     (state: AuthState) => state.setAuthenticated
   );
@@ -21,7 +25,15 @@ const LoginForm: React.FC = () => {
       console.error("error", error);
     },
     onSuccess: (data) => {
-      console.log("data from login", data);
+      console.log("data from login", data.data.user);
+      setLogedInUser(data.data.user);
+      setAuthenticated(true);
+
+      navigate("/rooms", { replace: true });
+
+      queryClient.invalidateQueries({
+        queryKey: ["who-am-i"],
+      });
     },
   });
 
@@ -30,9 +42,6 @@ const LoginForm: React.FC = () => {
     console.log({ username, password });
 
     await loginMutation.mutateAsync({ username, password });
-
-    setAuthenticated(true);
-    navigate("/rooms", { replace: true });
   };
 
   return (

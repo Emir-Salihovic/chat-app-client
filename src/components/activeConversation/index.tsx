@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { EllipsisHorizontalIcon } from "../../icons";
 import { socket } from "../../main";
@@ -17,9 +17,11 @@ import useAuthStore, { AuthState } from "../../store/authStore";
 export default function ActiveConversation() {
   const queryClient = useQueryClient();
   const params = useParams();
+  const navigate = useNavigate();
   const prevRoomRef = useRef<string>(params?.roomId as string);
 
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+
   const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
     []
   );
@@ -29,8 +31,8 @@ export default function ActiveConversation() {
     queryFn: () =>
       fetchSingleRoom(logedInUser?._id as string, params.roomId as string),
     enabled: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    // refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
   });
 
   const { data: roomOnlineMembers, refetch } = useQuery({
@@ -52,8 +54,9 @@ export default function ActiveConversation() {
   });
 
   useEffect(() => {
-    console.log("room id", prevRoomRef.current);
-    fetchRoom();
+    if (logedInUser?._id) {
+      fetchRoom();
+    }
     getMessagesForRoom();
 
     const handleUserChangedRoom = (message: string) => {
@@ -63,6 +66,32 @@ export default function ActiveConversation() {
       });
     };
 
+    const handleUserLeftRoomMessage = (message: string) => {
+      console.log("message if user left room", message);
+      // navigate("/rooms");
+
+      queryClient.invalidateQueries({
+        queryKey: ["rooms-joined"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["rooms"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-messages"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-online-members"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-members-count"],
+      });
+    };
+
+    socket.on("userLeftRoom", handleUserLeftRoomMessage);
     socket.on("userChangedRoom", handleUserChangedRoom);
 
     queryClient.invalidateQueries({
@@ -80,20 +109,37 @@ export default function ActiveConversation() {
     prevRoomRef.current = params.roomId as string;
 
     console.log("prev room ref", prevRoomRef.current);
-  }, [params.roomId]);
+  }, [params.roomId, logedInUser?._id]);
 
   useEffect(() => {
+    console.log("effect runs room id checking...");
     const handleMemberJoinedMessage = (message: string) => {
       setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
 
       queryClient.invalidateQueries({
         queryKey: ["rooms-joined"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-messages"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-online-members"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-members-count"],
+      });
     };
 
     const handleReceivedMessage = (message: string) => {
       console.log("message received", message);
       getMessagesForRoom();
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-online-members"],
+      });
     };
 
     socket.on("message", handleMemberJoinedMessage);
@@ -134,7 +180,8 @@ export default function ActiveConversation() {
       <RoomJoinedMessage
         messages={memberJoinedMessages}
         onRemoveMessage={handleRemoveMessage}
-        show={singleRoomData?.hasJoinedRoom}
+        // show={singleRoomData?.hasJoinedRoom}
+        show={true}
       />
 
       <div className="flex flex-col relative h-full">

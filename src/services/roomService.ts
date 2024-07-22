@@ -35,3 +35,8 @@ export async function fetchRoomOnlineMembers(roomId: string) {
   const response = await axios(`/rooms/online/${roomId}`);
   return response.data;
 }
+
+export async function leaveRoom(roomId: string) {
+  const response = await axios(`/rooms/leave/${roomId}`);
+  return response.data;
+}
