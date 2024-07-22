@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import Logo from "../../assets/chat.png";
 import { AllChatsIcon, LogoutIcon } from "../../icons";
@@ -8,6 +8,7 @@ import { socket } from "../../main";
 
 function Sidebar() {
   const navigate = useNavigate();
+  const params = useParams();
 
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
 
@@ -26,6 +27,11 @@ function Sidebar() {
       setLogedInUser(null);
 
       navigate("/login");
+
+      socket.emit("userLogout", {
+        userId: logedInUser?._id,
+        roomId: params?.roomId,
+      });
     },
     onError(err: any) {
       console.error("err while loging out", err);
@@ -37,6 +43,7 @@ function Sidebar() {
 
     socket.emit("userLogout", {
       userId: logedInUser?._id,
+      roomId: params.roomId,
     });
   }
 

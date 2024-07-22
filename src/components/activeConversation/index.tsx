@@ -91,8 +91,15 @@ export default function ActiveConversation() {
       });
     };
 
+    const handleUserLogedOut = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["room-online-members"],
+      });
+    };
+
     socket.on("userLeftRoom", handleUserLeftRoomMessage);
     socket.on("userChangedRoom", handleUserChangedRoom);
+    socket.on("userLogedOut", handleUserLogedOut);
 
     queryClient.invalidateQueries({
       queryKey: ["room-members-count"],
