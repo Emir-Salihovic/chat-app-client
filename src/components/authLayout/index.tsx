@@ -22,12 +22,14 @@ export default function AuthLayout() {
     data: logedInUserData,
     isLoading,
     isFetching,
+    refetch: fetchLogedInUser,
   } = useQuery({
     queryKey: ["who-am-i"],
     queryFn: whoAmI,
     refetchOnWindowFocus: false,
     refetchIntervalInBackground: false,
     retryDelay: 1000,
+    // enabled: false,
   });
 
   useEffect(() => {
@@ -39,6 +41,8 @@ export default function AuthLayout() {
 
   useEffect(() => {
     if (authenticated) {
+      fetchLogedInUser();
+
       navigate(location.pathname, { replace: true });
       return;
     }

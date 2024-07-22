@@ -29,11 +29,12 @@ const LoginForm: React.FC = () => {
       setLogedInUser(data.data.user);
       setAuthenticated(true);
 
+      // queryClient.invalidateQueries({
+      //   queryKey: ["who-am-i"],
+      // });
+    },
+    onSettled: () => {
       navigate("/rooms", { replace: true });
-
-      queryClient.invalidateQueries({
-        queryKey: ["who-am-i"],
-      });
     },
   });
 

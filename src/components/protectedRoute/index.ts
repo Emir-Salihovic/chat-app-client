@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authenticated && !logedInUser?._id) {
+    if (!authenticated || !logedInUser) {
       navigate("/login", { replace: true });
     }
   }, [navigate, authenticated, logedInUser]);
