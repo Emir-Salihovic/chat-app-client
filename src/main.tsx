@@ -1,16 +1,20 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
 import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-
-import { io } from "socket.io-client";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import { io } from "socket.io-client";
+import { ToastContainer } from "react-toastify";
+
+import App from "./App.tsx";
+
 import AuthLayout from "./components/authLayout/index.tsx";
 import LoginForm from "./components/loginForm/index.tsx";
 import SignupForm from "./components/signupForm/index.tsx";
@@ -19,12 +23,18 @@ import ActiveConversation from "./components/activeConversation/index.tsx";
 
 export const socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
 
+// Create a client
+const queryClient = new QueryClient();
+
 socket.on("connect", () => {
   console.log("Connected to server");
 });
 
-// Create a client
-const queryClient = new QueryClient();
+socket.on("roomAdded", () => {
+  queryClient.invalidateQueries({
+    queryKey: ["rooms"],
+  });
+});
 
 const router = createBrowserRouter([
   {
@@ -65,7 +75,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   // <React.StrictMode>
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
-    <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
+    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+    <ToastContainer />
   </QueryClientProvider>
   // </React.StrictMode>
 );

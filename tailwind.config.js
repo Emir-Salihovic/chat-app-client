@@ -12,6 +12,10 @@ export default {
         messageContainerGuest: "#EEEEF8",
         messageContainerSender: "#7678ED",
       },
+      backgroundImage: {
+        modalOverlay:
+          "linear-gradient(to bottom, rgba(0, 0, 0, .1), rgba(0, 0, 0, .3))",
+      },
     },
   },
   plugins: [],

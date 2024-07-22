@@ -40,3 +40,8 @@ export async function leaveRoom(roomId: string) {
   const response = await axios(`/rooms/leave/${roomId}`);
   return response.data;
 }
+
+export async function addRoom(roomName: string) {
+  const response = await axios.post(`/rooms`, { name: roomName });
+  return response.data;
+}
