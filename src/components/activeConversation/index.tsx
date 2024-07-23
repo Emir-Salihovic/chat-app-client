@@ -149,6 +149,10 @@ export default function ActiveConversation() {
       queryClient.invalidateQueries({
         queryKey: ["room-online-members"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["room-messages"],
+      });
     };
 
     const handleRoomDeletedMessage = (message: string) => {
@@ -209,7 +213,7 @@ export default function ActiveConversation() {
         show={true}
       />
 
-      <div className="flex flex-col relative h-full">
+      <div className="flex flex-col relative min-h-[85%] max-h-[85%] overflow-y-scroll">
         {roomMessages?.roomMessages.map((roomMessage: any) => {
           const isUserOnline = roomOnlineMembers?.onlineMembers.find(
             (member: any) => {
