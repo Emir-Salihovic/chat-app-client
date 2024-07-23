@@ -9,73 +9,120 @@ import {
   fetchSingleRoom,
 } from "../../services/roomService";
 import MessageInput from "../messageInput";
-import { instance as axios } from "../../services";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import SocketService from "../../services/socketService";
+import useSocket from "../../hooks/useSocket";
+import MyMessage from "../myMessage";
+import GuestMessage from "../guestMesage";
+import { getRoomMessages } from "../../services/messageService";
 
 export default function ActiveConversation() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
   const params = useParams();
-  const prevRoomRef = useRef<string>(params?.roomId as string);
-  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+
   const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
     []
   );
 
+  const prevRoomRef = useRef<string>(params.roomId!);
+  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+
   const { data: singleRoomData, refetch: fetchRoom } = useQuery({
     queryKey: ["single-room"],
-    queryFn: () =>
-      fetchSingleRoom(logedInUser?._id as string, params.roomId as string),
+    queryFn: () => fetchSingleRoom(logedInUser?._id!, params.roomId!),
     enabled: false,
   });
 
-  const { data: roomOnlineMembers, refetch } = useQuery({
+  const { data: roomOnlineMembers } = useQuery({
     queryKey: ["room-online-members"],
-    queryFn: () => fetchRoomOnlineMembers(params?.roomId as string),
+    queryFn: () => fetchRoomOnlineMembers(params.roomId!),
   });
 
   const { data: roomMessages, refetch: getMessagesForRoom } = useQuery({
     queryKey: ["room-messages"],
-    queryFn: async () => {
-      const response = await axios(`/rooms/messages/${params.roomId}`);
-      return response.data;
-    },
+    queryFn: () => getRoomMessages(params.roomId!),
   });
 
-  const { data: roomMembersCount, refetch: getRoomMembersCount } = useQuery({
+  const { data: roomMembersCount } = useQuery({
     queryKey: ["room-members-count"],
-    queryFn: () => fetchRoomMembersCount(params?.roomId as string),
+    queryFn: () => fetchRoomMembersCount(params.roomId!),
+  });
+
+  const handleUserLeftRoomMessage = (message: string) => {
+    console.log("message if user left room", message);
+
+    const queries = [
+      "rooms-joined",
+      "rooms",
+      "room-messages",
+      "room-online-members",
+      "room-members-count",
+    ];
+
+    queries.forEach((query: string) => {
+      queryClient.invalidateQueries({ queryKey: [query] });
+    });
+  };
+
+  const handleUserChangedRoom = (message: string) => {
+    console.log("message user changed room", message);
+    queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
+  };
+
+  const handleUserLogedOut = () => {
+    queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
+  };
+
+  const handleMemberJoinedMessage = (message: string) => {
+    const queries = [
+      "rooms-joined",
+      "room-messages",
+      "room-online-members",
+      "room-members-count",
+    ];
+
+    queries.forEach((query: string) => {
+      queryClient.invalidateQueries({ queryKey: [query] });
+    });
+
+    setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  const handleReceivedMessage = (message: string) => {
+    console.log("message received", message);
+    queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
+    queryClient.invalidateQueries({ queryKey: ["room-messages"] });
+  };
+
+  let deletedRoomTimeout: any;
+
+  const handleRoomDeletedMessage = (message: string) => {
+    console.log("message", message);
+    setMemberJoinedMessages((prevState: string[]) => [...prevState, message]);
+    deletedRoomTimeout = setTimeout(() => {
+      navigate("/rooms");
+    }, 2000);
+  };
+
+  useSocket({
+    userLeftRoom: handleUserLeftRoomMessage,
+    userChangedRoom: handleUserChangedRoom,
+    userLogedOut: handleUserLogedOut,
+    message: handleMemberJoinedMessage,
+    messageReceived: handleReceivedMessage,
+    roomDeleted: handleRoomDeletedMessage,
   });
 
   useEffect(() => {
     console.log("Active conversation first effect...");
+
     if (logedInUser?._id) {
       fetchRoom();
     }
+
     getMessagesForRoom();
-
-    const handleUserChangedRoom = (message: string) => {
-      console.log("message user changed room", message);
-      queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
-    };
-
-    const handleUserLeftRoomMessage = (message: string) => {
-      console.log("message if user left room", message);
-      queryClient.invalidateQueries({ queryKey: ["rooms-joined"] });
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      queryClient.invalidateQueries({ queryKey: ["room-messages"] });
-      queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
-      queryClient.invalidateQueries({ queryKey: ["room-members-count"] });
-    };
-
-    const handleUserLogedOut = () => {
-      queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
-    };
-
-    SocketService.on("userLeftRoom", handleUserLeftRoomMessage);
-    SocketService.on("userChangedRoom", handleUserChangedRoom);
-    SocketService.on("userLogedOut", handleUserLogedOut);
 
     queryClient.invalidateQueries({ queryKey: ["room-members-count"] });
 
@@ -86,55 +133,12 @@ export default function ActiveConversation() {
       });
     }
 
-    prevRoomRef.current = params.roomId as string;
-
-    console.log("prev room ref", prevRoomRef.current);
+    prevRoomRef.current = params.roomId!;
 
     return () => {
-      SocketService.off("userLeftRoom", handleUserLeftRoomMessage);
-      SocketService.off("userChangedRoom", handleUserChangedRoom);
-      SocketService.off("userLogedOut", handleUserLogedOut);
-    };
-  }, [params.roomId, logedInUser?._id]);
-
-  useEffect(() => {
-    console.log("Active conversation second effect...");
-    let deletedRoomTimeout: any;
-
-    const handleMemberJoinedMessage = (message: string) => {
-      setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
-      queryClient.invalidateQueries({ queryKey: ["rooms-joined"] });
-      queryClient.invalidateQueries({ queryKey: ["room-messages"] });
-      queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
-      queryClient.invalidateQueries({ queryKey: ["room-members-count"] });
-    };
-
-    const handleReceivedMessage = (message: string) => {
-      console.log("message received", message);
-      getMessagesForRoom();
-      queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
-      queryClient.invalidateQueries({ queryKey: ["room-messages"] });
-    };
-
-    const handleRoomDeletedMessage = (message: string) => {
-      console.log("message", message);
-      setMemberJoinedMessages((prevState: string[]) => [...prevState, message]);
-      deletedRoomTimeout = setTimeout(() => {
-        navigate("/rooms");
-      }, 2000);
-    };
-
-    SocketService.on("message", handleMemberJoinedMessage);
-    SocketService.on("messageReceived", handleReceivedMessage);
-    SocketService.on("roomDeleted", handleRoomDeletedMessage);
-
-    return () => {
-      SocketService.off("message", handleMemberJoinedMessage);
-      SocketService.off("messageReceived", handleReceivedMessage);
-      SocketService.off("roomDeleted", handleRoomDeletedMessage);
       clearTimeout(deletedRoomTimeout);
     };
-  }, []);
+  }, [params.roomId, logedInUser?._id]);
 
   const handleRemoveMessage = useCallback((index: number) => {
     setMemberJoinedMessages((prevMessages) => {
@@ -175,71 +179,19 @@ export default function ActiveConversation() {
 
           if (roomMessage.userId._id === logedInUser?._id) {
             return (
-              <div key={roomMessage._id} className="mt-4 min-h-[70px]">
-                <div className="flex items-end gap-x-2 absolute right-0 lg:right-4 max-w-[100%] lg:max-w-[45%] w-full">
-                  <div className="w-16 h-14 relative">
-                    <img
-                      src={logedInUser?.avatar}
-                      alt="avatar"
-                      className="h-full w-full rounded-md"
-                    />
-                    <div
-                      className={`absolute bottom-[-3px] right-[-3px] h-3 w-3 ${
-                        isUserOnline ? "bg-green-500" : "bg-red-500"
-                      } rounded-full border-2 border-white`}
-                    ></div>
-                  </div>
-                  <div className="max-w-[90%] bg-messageContainerSender p-2 rounded-md text-[#eee] w-full">
-                    <h6 className="font-semibold text-sm md:text-md">You</h6>
-                    <p className="text-[10px] md:text-xs font-medium">
-                      {roomMessage.message}
-                    </p>
-                    <div className="flex justify-end mt-2">
-                      <p className="text-xs">
-                        {new Date(roomMessage.createdAt).toLocaleTimeString(
-                          [],
-                          { hour: "2-digit", minute: "2-digit" }
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <MyMessage
+                key={roomMessage._id}
+                roomMessage={roomMessage}
+                isUserOnline={isUserOnline}
+              />
             );
           } else {
             return (
-              <div className="mt-4" key={roomMessage._id}>
-                <div className="flex items-end gap-x-2">
-                  <div className="w-14 h-14 relative">
-                    <img
-                      src={roomMessage.userId.avatar}
-                      alt="avatar"
-                      className="h-full w-full rounded-md"
-                    />
-                    <div
-                      className={`absolute bottom-[-3px] right-[-3px] h-3 w-3 ${
-                        isUserOnline ? "bg-green-500" : "bg-red-500"
-                      } rounded-full border-2 border-white`}
-                    ></div>
-                  </div>
-                  <div className="max-w-[100%] lg:max-w-[40%] bg-messageContainerGuest p-2 rounded-md w-full">
-                    <h6 className="text-messageText font-semibold text-sm md:text-md">
-                      {roomMessage.userId.username}
-                    </h6>
-                    <p className="text-[10px] md:text-xs font-medium">
-                      {roomMessage.message}
-                    </p>
-                    <div className="flex justify-end mt-2">
-                      <p className="text-gray-400 text-xs">
-                        {new Date(roomMessage.createdAt).toLocaleTimeString(
-                          [],
-                          { hour: "2-digit", minute: "2-digit" }
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <GuestMessage
+                key={roomMessage._id}
+                roomMessage={roomMessage}
+                isUserOnline={isUserOnline}
+              />
             );
           }
         })}
