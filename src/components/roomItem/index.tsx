@@ -6,7 +6,7 @@ import { socket } from "../../main";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { DeleteRoomIcon } from "../../icons";
 import Modal from "../modal";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type RoomItemProps = {
   room: any;
@@ -14,6 +14,13 @@ type RoomItemProps = {
 
 const isRoomJoined = (roomId: string, roomsJoined: any[]) => {
   return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);
+};
+
+const getRoomInitials = (roomName: string) => {
+  return roomName.split(" ").length > 1
+    ? roomName.split("")[0].toUpperCase() +
+        roomName.split(" ")[1][0].toUpperCase()
+    : roomName.split("")[0].toUpperCase() + "R";
 };
 
 export default function RoomItem({ room }: RoomItemProps) {
@@ -42,7 +49,6 @@ export default function RoomItem({ room }: RoomItemProps) {
     return roomBackgrounds[backgroundIndex];
   }, []);
 
-  const roomInitials = room.name.split("")[0] + room.name.split(" ")[1][0];
   const roomAlreadyJoined = isRoomJoined(room._id, roomsJoined);
 
   async function joinRoom(roomId: string) {
@@ -72,7 +78,7 @@ export default function RoomItem({ room }: RoomItemProps) {
           <div
             className={`h-[45px] w-[45px] ${roomBackgroundSwitcher} text-white rounded-md flex items-center justify-center`}
           >
-            <p className="text-lg">{roomInitials}</p>
+            <p className="text-lg">{getRoomInitials(room.name)}</p>
           </div>
 
           <div className="hidden md:flex flex-col">
