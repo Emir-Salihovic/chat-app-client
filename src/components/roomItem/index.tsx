@@ -6,7 +6,7 @@ import { socket } from "../../main";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { DeleteRoomIcon } from "../../icons";
 import Modal from "../modal";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type RoomItemProps = {
   room: any;
@@ -26,16 +26,21 @@ export default function RoomItem({ room }: RoomItemProps) {
     queryFn: fetchJoinedRooms,
   });
 
-  // const leaveRoomMutation = useMutation({
-  //   mutationKey: ["leave-room"],
-  //   mutationFn: leaveRoom,
-  //   onSuccess: (data: any) => {
-  //     console.log('Data after room leaving', data)
-  //   },
-  //   onError: (err: any) => {
-  //     console.error('Error on leaving room', err)
-  //   }
-  // })
+  const roomBackgroundSwitcher = useMemo(() => {
+    const roomBackgrounds = [
+      "bg-blue-500",
+      "bg-red-500",
+      "bg-messageContainerSender",
+      "bg-green-500",
+      "bg-amber-500",
+      "bg-emerald-500",
+      "bg-pink-500",
+      "bg-rose-500",
+    ];
+
+    const backgroundIndex = Math.floor(Math.random() * roomBackgrounds.length);
+    return roomBackgrounds[backgroundIndex];
+  }, []);
 
   const roomInitials = room.name.split("")[0] + room.name.split(" ")[1][0];
   const roomAlreadyJoined = isRoomJoined(room._id, roomsJoined);
@@ -64,7 +69,9 @@ export default function RoomItem({ room }: RoomItemProps) {
         className="bg-boxGrey flex justify-center items-center md:justify-between gap-x-2 p-2 rounded-lg mb-2"
       >
         <div className="flex gap-x-2">
-          <div className="h-[45px] w-[45px] bg-messageContainerSender text-white rounded-md flex items-center justify-center">
+          <div
+            className={`h-[45px] w-[45px] ${roomBackgroundSwitcher} text-white rounded-md flex items-center justify-center`}
+          >
             <p className="text-lg">{roomInitials}</p>
           </div>
 
