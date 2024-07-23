@@ -5,13 +5,19 @@ import Logo from "../../assets/chat.png";
 import { useState } from "react";
 import { addRoom } from "../../services/roomService";
 import { socket } from "../../main";
+import { useNavigate } from "react-router";
+import useAuthStore, { AuthState } from "../../store/authStore";
 
 type AddRoomFormProps = {
   toggleModal: () => void;
 };
 
 const AddRoomForm: React.FC<AddRoomFormProps> = ({ toggleModal }) => {
+  const navigate = useNavigate();
   const [roomName, setRoomName] = useState<string>("");
+
+  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+
   const addRoomMutation = useMutation({
     mutationKey: ["add-room"],
     mutationFn: () => addRoom(roomName),
@@ -19,11 +25,20 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ toggleModal }) => {
     onError(err) {
       console.error("There was a problem creating the room", err);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const { room } = data;
+      console.log("data after room added", data);
       toggleModal();
       toast.success("Room added!");
 
       socket.emit("createRoom");
+
+      socket.emit("joinRoom", {
+        userId: logedInUser?._id,
+        roomId: room._id,
+      });
+
+      navigate(`/rooms/${room._id}`);
     },
   });
 

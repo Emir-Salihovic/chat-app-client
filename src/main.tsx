@@ -36,6 +36,12 @@ socket.on("roomAdded", () => {
   });
 });
 
+socket.on("roomDeleted", () => {
+  queryClient.invalidateQueries({
+    queryKey: ["rooms"],
+  });
+});
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -75,7 +81,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   // <React.StrictMode>
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
-    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+    <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
     <ToastContainer />
   </QueryClientProvider>
   // </React.StrictMode>

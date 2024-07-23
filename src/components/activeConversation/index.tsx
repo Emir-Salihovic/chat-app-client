@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { EllipsisHorizontalIcon } from "../../icons";
 import { socket } from "../../main";
@@ -15,9 +15,9 @@ import { instance as axios } from "../../services";
 import useAuthStore, { AuthState } from "../../store/authStore";
 
 export default function ActiveConversation() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const params = useParams();
-  const navigate = useNavigate();
   const prevRoomRef = useRef<string>(params?.roomId as string);
 
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
@@ -120,6 +120,8 @@ export default function ActiveConversation() {
 
   useEffect(() => {
     console.log("effect runs room id checking...");
+    let deletedRoomTimeout: any;
+
     const handleMemberJoinedMessage = (message: string) => {
       setMemberJoinedMessages((prevMessages) => [...prevMessages, message]);
 
@@ -149,12 +151,28 @@ export default function ActiveConversation() {
       });
     };
 
+    const handleRoomDeletedMessage = (message: string) => {
+      console.log("message", message);
+
+      setMemberJoinedMessages((prevState: string[]) => {
+        return [...prevState, message];
+      });
+
+      deletedRoomTimeout = setTimeout(() => {
+        navigate("/rooms");
+      }, 2000);
+    };
+
     socket.on("message", handleMemberJoinedMessage);
     socket.on("messageReceived", handleReceivedMessage);
+    socket.on("roomDeleted", handleRoomDeletedMessage);
 
     return () => {
       socket.off("message", handleMemberJoinedMessage);
       socket.off("messageReceived", handleReceivedMessage);
+      socket.off("roomDeleted", handleRoomDeletedMessage);
+
+      clearTimeout(deletedRoomTimeout);
     };
   }, []);
 

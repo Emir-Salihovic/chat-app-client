@@ -44,7 +44,7 @@ export default function RoomJoinedMessage({
       <div className="my-4 rounded-sm p-1 text-center text-xs font-semibold text-messageText">
         {visibleMessages.map((message: string, messageIndex: number) => (
           <h6 className="mt-2" key={messageIndex}>
-            {message}! 🥳
+            {message}!
           </h6>
         ))}
       </div>
