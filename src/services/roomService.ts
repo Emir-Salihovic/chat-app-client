@@ -1,4 +1,4 @@
-import { socket } from "../main";
+import { socketService as socket } from "../main";
 import { instance as axios } from "./index";
 
 export async function fetchRooms() {

@@ -4,7 +4,7 @@ import Logo from "../../assets/chat.png";
 import { AddRoomIcon, AllChatsIcon, LogoutIcon } from "../../icons";
 import { logout } from "../../services/authService";
 import useAuthStore, { AuthState } from "../../store/authStore";
-import { socket } from "../../main";
+import { socketService as socket } from "../../main";
 
 type SidebarProps = {
   toggleModal: () => void;

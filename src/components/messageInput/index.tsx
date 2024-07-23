@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { socket } from "../../main";
+import { socketService as socket } from "../../main";
 import { toast } from "react-toastify";
 
 import { SendMessageIcon } from "../../icons";

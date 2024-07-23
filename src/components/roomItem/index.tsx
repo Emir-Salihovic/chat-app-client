@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchJoinedRooms } from "../../services/roomService";
-import { socket } from "../../main";
+import { socketService as socket } from "../../main";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { DeleteRoomIcon } from "../../icons";
 import Modal from "../modal";

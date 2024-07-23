@@ -1,3 +1,4 @@
+// main.tsx
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,7 +11,6 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { io } from "socket.io-client";
 import { ToastContainer } from "react-toastify";
 
 import App from "./App.tsx";
@@ -21,22 +21,21 @@ import SignupForm from "./components/signupForm/index.tsx";
 import ProtectedRoute from "./components/protectedRoute/index.ts";
 import ActiveConversation from "./components/activeConversation/index.tsx";
 
-export const socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
+import SocketService from "./services/socketService.ts";
 
 // Create a client
 const queryClient = new QueryClient();
 
-socket.on("connect", () => {
-  console.log("Connected to server");
-});
+export const socketService = SocketService.socket; // Initialize the SocketService
 
-socket.on("roomAdded", () => {
+// Handle socket events
+socketService.on("roomAdded", () => {
   queryClient.invalidateQueries({
     queryKey: ["rooms"],
   });
 });
 
-socket.on("roomDeleted", () => {
+socketService.on("roomDeleted", () => {
   queryClient.invalidateQueries({
     queryKey: ["rooms"],
   });
@@ -78,11 +77,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // <React.StrictMode>
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
     <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
     <ToastContainer />
   </QueryClientProvider>
-  // </React.StrictMode>
 );

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Logo from "../../assets/chat.png";
 import { useState } from "react";
 import { addRoom } from "../../services/roomService";
-import { socket } from "../../main";
+import { socketService as socket } from "../../main";
 import { useNavigate } from "react-router";
 import useAuthStore, { AuthState } from "../../store/authStore";
 
