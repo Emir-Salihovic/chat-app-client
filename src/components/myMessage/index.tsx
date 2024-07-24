@@ -12,8 +12,8 @@ const MyMessage = ({ isUserOnline, roomMessage }: MyMessageProps) => {
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
 
   return (
-    <div className="mt-4 min-h-[70px]">
-      <div className="flex items-end gap-x-2 absolute right-0 lg:right-4 max-w-[100%] lg:max-w-[45%] w-full">
+    <div className="mt-4 h-full flex justify-end">
+      <div className="flex items-end gap-x-2 right-0 lg:right-4 max-w-[100%] lg:max-w-[45%] w-full">
         <div className="w-16 h-14 relative">
           <img
             src={logedInUser?.avatar}

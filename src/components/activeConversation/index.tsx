@@ -201,7 +201,9 @@ export default function ActiveConversation() {
           }
         })}
 
-        <div ref={messagesContainerRef}>&nbsp;</div>
+        <div className="h-0" ref={messagesContainerRef}>
+          &nbsp;
+        </div>
       </div>
       <MessageInput roomId={params.roomId} />
     </div>
