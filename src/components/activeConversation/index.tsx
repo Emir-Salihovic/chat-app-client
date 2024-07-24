@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { EllipsisHorizontalIcon } from "../../icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RoomJoinedMessage from "../roomJoinedMessage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +14,7 @@ import useSocket from "../../hooks/useSocket";
 import MyMessage from "../myMessage";
 import GuestMessage from "../guestMesage";
 import { getRoomMessages } from "../../services/messageService";
+import RoomHeading from "../roomHeading";
 
 let deletedRoomTimeout: any;
 let scrollTimeout: any;
@@ -164,20 +164,11 @@ export default function ActiveConversation() {
 
   return (
     <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 relative">
-      <div className="flex justify-between">
-        <div className="flex flex-col">
-          <h3 className="font-medium text-lg md:text-xl">
-            {singleRoomData?.room.name}
-          </h3>
-          <p className="text-gray-400 text-xs md:text-sm">
-            {roomMembersCount?.roomMembersCount} members,{" "}
-            {roomOnlineMembers?.onlineMembers?.length} online
-          </p>
-        </div>
-        <div className="mt-2">
-          <EllipsisHorizontalIcon />
-        </div>
-      </div>
+      <RoomHeading
+        membersCount={roomMembersCount?.roomMembersCount}
+        onlineMembers={roomOnlineMembers?.onlineMembers?.length}
+        room={singleRoomData?.room}
+      />
 
       <RoomJoinedMessage
         messages={memberJoinedMessages}
