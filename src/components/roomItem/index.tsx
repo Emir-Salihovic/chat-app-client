@@ -12,7 +12,7 @@ type RoomItemProps = {
   room: any;
 };
 
-const isRoomJoined = (roomId: string, roomsJoined: any[]) => {
+const isRoomJoined = (roomId: string, roomsJoined: any) => {
   return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);
 };
 

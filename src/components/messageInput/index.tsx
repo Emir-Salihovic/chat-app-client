@@ -19,7 +19,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
     mutationKey: ["send-message"],
     mutationFn: () => sendMessage(roomId!, message),
 
-    onSuccess: (data) => {
+    onSuccess: () => {
       setMessage("");
       socket.emit("messageSent", { userId: logedInUser?._id, roomId, message });
     },
