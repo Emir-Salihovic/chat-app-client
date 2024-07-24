@@ -36,6 +36,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
     },
   });
 
+  const disabled = sendMessageMutation.isPending;
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
@@ -61,17 +63,30 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
   };
 
   return (
-    <div className="flex items-center bg-messageContainerGuest rounded-full px-4 py-2 w-[64%] fixed bottom-6 left-[34%]">
+    <div
+      className={`flex items-center bg-messageContainerGuest rounded-full px-4 py-2 w-[64%] fixed bottom-6 left-[34%] ${
+        disabled ? "text-gray-300" : "text-gray-800"
+      }`}
+    >
       <input
         type="text"
         value={message}
         onChange={handleInputChange}
         placeholder="Your message"
-        className="flex-1 bg-transparent border-none outline-none px-2 text-gray-800"
+        className={`flex-1 bg-transparent border-none outline-none px-2 ${
+          disabled
+            ? "placeholder:text-gray-300 cursor-not-allowed"
+            : "placeholder:text-gray-400"
+        }`}
         onKeyDown={handleKeyDown}
+        disabled={disabled}
       />
 
-      <button className="cursor-pointer" onClick={() => handleSend()}>
+      <button
+        disabled={disabled}
+        className="cursor-pointer disabled:bg-gray-100 disabled:bg-transparent disabled:cursor-not-allowed"
+        onClick={() => handleSend()}
+      >
         <SendMessageIcon />
       </button>
     </div>
