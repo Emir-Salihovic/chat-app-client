@@ -55,11 +55,6 @@ export default function RoomItem({ room }: RoomItemProps) {
     socket.emit("joinRoom", { userId: logedInUser?._id, roomId });
   }
 
-  async function leaveRoom(roomId: string) {
-    console.log("leaving room...");
-    socket.emit("leftRoom", { userId: logedInUser?._id, roomId });
-  }
-
   async function deleteRoom(roomId: string) {
     socket.emit("deleteRoom", {
       userId: logedInUser?._id,
@@ -96,7 +91,7 @@ export default function RoomItem({ room }: RoomItemProps) {
                 setDeleteModalOpen((prevState: boolean) => !prevState)
               }
               className="bg-red-500 cursor-pointer text-white text-xs rounded-lg flex items-center justify-center h-[30px] w-[30px]"
-              title="Leave room..."
+              title="Delete room..."
             >
               <button className="py-1 px-3 inline-block">
                 <DeleteRoomIcon />
@@ -104,7 +99,7 @@ export default function RoomItem({ room }: RoomItemProps) {
             </div>
           )}
 
-          {!roomAlreadyJoined && !isRoomsJoinedLoading ? (
+          {!roomAlreadyJoined && !isRoomsJoinedLoading && (
             <div
               className="bg-messageContainerSender text-white text-xs rounded-lg flex items-center justify-center h-[30px] w-[30px]"
               title="Join room..."
@@ -116,13 +111,6 @@ export default function RoomItem({ room }: RoomItemProps) {
                 +
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => leaveRoom(room._id)}
-              className="bg-red-500 text-white text-xs py-1 px-3 inline-block rounded-lg h-[30px]"
-            >
-              &times;
-            </button>
           )}
         </div>
       </div>

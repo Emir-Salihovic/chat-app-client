@@ -5,7 +5,7 @@ import Logo from "../../assets/chat.png";
 import { useState } from "react";
 import { addRoom } from "../../services/roomService";
 import { socketService as socket } from "../../main";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import useAuthStore, { AuthState } from "../../store/authStore";
 
 type AddRoomFormProps = {

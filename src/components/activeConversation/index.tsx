@@ -54,11 +54,14 @@ export default function ActiveConversation() {
     queryFn: () => fetchRoomMembersCount(params.roomId!),
   });
 
+  const hasBecomeMember = roomOnlineMembers?.onlineMembers.some(
+    (member: { userId: string }) => member.userId === logedInUser?._id
+  );
+
   const handleUserLeftRoomMessage = (message: string) => {
     console.log("message if user left room", message);
 
     const queries = [
-      "rooms-joined",
       "rooms",
       "room-messages",
       "room-online-members",
@@ -168,6 +171,7 @@ export default function ActiveConversation() {
         membersCount={roomMembersCount?.roomMembersCount}
         onlineMembers={roomOnlineMembers?.onlineMembers?.length}
         room={singleRoomData?.room}
+        showOptions={hasBecomeMember}
       />
 
       <RoomJoinedMessage
@@ -205,7 +209,7 @@ export default function ActiveConversation() {
           &nbsp;
         </div>
       </div>
-      <MessageInput roomId={params.roomId} />
+      {hasBecomeMember && <MessageInput roomId={params.roomId} />}
     </div>
   );
 }
