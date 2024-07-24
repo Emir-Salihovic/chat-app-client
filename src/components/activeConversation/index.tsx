@@ -16,6 +16,9 @@ import MyMessage from "../myMessage";
 import GuestMessage from "../guestMesage";
 import { getRoomMessages } from "../../services/messageService";
 
+let deletedRoomTimeout: any;
+let scrollTimeout: any;
+
 export default function ActiveConversation() {
   const queryClient = useQueryClient();
 
@@ -27,6 +30,7 @@ export default function ActiveConversation() {
   );
 
   const prevRoomRef = useRef<string>(params.roomId!);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
 
   const { data: singleRoomData, refetch: fetchRoom } = useQuery({
@@ -92,11 +96,20 @@ export default function ActiveConversation() {
 
   const handleReceivedMessage = (message: string) => {
     console.log("message received", message);
+
     queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
     queryClient.invalidateQueries({ queryKey: ["room-messages"] });
-  };
 
-  let deletedRoomTimeout: any;
+    if (messagesContainerRef.current) {
+      // TODO
+      scrollTimeout = scrollTimeout = setTimeout(() => {
+        messagesContainerRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }, 1000);
+    }
+  };
 
   const handleRoomDeletedMessage = (message: string) => {
     console.log("message", message);
@@ -137,6 +150,7 @@ export default function ActiveConversation() {
 
     return () => {
       clearTimeout(deletedRoomTimeout);
+      clearTimeout(scrollTimeout);
     };
   }, [params.roomId, logedInUser?._id]);
 
@@ -149,7 +163,7 @@ export default function ActiveConversation() {
   }, []);
 
   return (
-    <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 overflow-y-scroll relative">
+    <div className="w-[80%] md:w-[70%] h-full py-0.5 px-4 relative">
       <div className="flex justify-between">
         <div className="flex flex-col">
           <h3 className="font-medium text-lg md:text-xl">
@@ -195,6 +209,8 @@ export default function ActiveConversation() {
             );
           }
         })}
+
+        <div ref={messagesContainerRef}>&nbsp;</div>
       </div>
       <MessageInput roomId={params.roomId} />
     </div>
