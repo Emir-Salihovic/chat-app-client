@@ -1,3 +1,5 @@
+import DefaultAvatar from "../../assets/default-avatar.png";
+
 type GuestMessageProps = {
   isUserOnline: boolean;
   roomMessage: {
@@ -16,7 +18,7 @@ const GuestMessage = ({ roomMessage, isUserOnline }: GuestMessageProps) => {
       <div className="flex items-end gap-x-2">
         <div className="w-14 h-14 relative">
           <img
-            src={roomMessage.userId.avatar}
+            src={roomMessage.userId.avatar || DefaultAvatar}
             alt="avatar"
             className="h-full w-full rounded-md"
           />

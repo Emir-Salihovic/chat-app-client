@@ -79,7 +79,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
-    <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
+    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     <ToastContainer />
   </QueryClientProvider>
 );
