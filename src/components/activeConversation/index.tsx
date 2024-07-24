@@ -15,6 +15,7 @@ import MyMessage from "../myMessage";
 import GuestMessage from "../guestMesage";
 import { getRoomMessages } from "../../services/messageService";
 import RoomHeading from "../roomHeading";
+import notificationSound from "../../assets/notification.mp3";
 
 let deletedRoomTimeout: any;
 let scrollTimeout: any;
@@ -102,6 +103,11 @@ export default function ActiveConversation() {
 
     queryClient.invalidateQueries({ queryKey: ["room-online-members"] });
     queryClient.invalidateQueries({ queryKey: ["room-messages"] });
+
+    if (!document.hasFocus()) {
+      const sound = new Audio(notificationSound);
+      sound.play();
+    }
 
     if (messagesContainerRef.current) {
       // TODO
