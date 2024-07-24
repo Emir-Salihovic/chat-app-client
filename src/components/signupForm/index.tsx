@@ -5,23 +5,40 @@ import { useMutation } from "@tanstack/react-query";
 import { AuthCredentials, signup } from "../../services/authService";
 import useAuthStore, { AuthState } from "../../store/authStore";
 
+type MyErrorResponse = {
+  response: {
+    data: {
+      message: string;
+    };
+  };
+};
+
 const SignupForm: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const navigate = useNavigate();
   const setAuthenticated = useAuthStore(
     (state: AuthState) => state.setAuthenticated
   );
 
+  const setLogedInUser = useAuthStore(
+    (state: AuthState) => state.setLogedInUser
+  );
+
   const signupMutation = useMutation({
     mutationFn: (data: AuthCredentials) => signup(data),
-    onError: (error) => {
+    onError: (error: MyErrorResponse) => {
       // An error happened!
       console.error("error", error);
+      setErrorMessage(error.response.data.message);
     },
     onSuccess: (data) => {
-      console.log("data from signup", data);
+      setLogedInUser(data.data.user);
+      setAuthenticated(true);
+
+      navigate("/rooms", { replace: true });
     },
   });
 
@@ -77,6 +94,11 @@ const SignupForm: React.FC = () => {
               required
             />
           </div>
+
+          <div className="text-red-500 text-sm text-center w-full mb-4">
+            <p>{errorMessage}</p>
+          </div>
+
           <button
             type="submit"
             className="w-full bg-messageContainerSender text-white py-2 rounded-md hover:bg-purple-700 transition duration-300"

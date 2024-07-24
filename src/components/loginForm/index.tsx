@@ -2,11 +2,18 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 import useAuthStore, { AuthState } from "../../store/authStore";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { AuthCredentials, login } from "../../services/authService";
 
+type MyErrorResponse = {
+  response: {
+    data: {
+      message: string;
+    };
+  };
+};
+
 const LoginForm: React.FC = () => {
-  const queryClient = useQueryClient();
   const setLogedInUser = useAuthStore(
     (state: AuthState) => state.setLogedInUser
   );
@@ -17,30 +24,26 @@ const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const loginMutation = useMutation({
     mutationFn: (data: AuthCredentials) => login(data),
-    onError: (error) => {
+    onError: (error: MyErrorResponse) => {
       // An error happened!
       console.error("error", error);
+      setErrorMessage(error.response.data.message);
     },
     onSuccess: (data) => {
-      console.log("data from login", data.data.user);
       setLogedInUser(data.data.user);
       setAuthenticated(true);
 
-      // queryClient.invalidateQueries({
-      //   queryKey: ["who-am-i"],
-      // });
-    },
-    onSettled: () => {
       navigate("/rooms", { replace: true });
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ username, password });
+    setErrorMessage("");
 
     await loginMutation.mutateAsync({ username, password });
   };
@@ -87,6 +90,11 @@ const LoginForm: React.FC = () => {
               required
             />
           </div>
+
+          <div className="text-red-500 text-sm text-center w-full mb-4">
+            <p>{errorMessage}</p>
+          </div>
+
           <div className="flex items-center mb-4 text-center">
             <a
               href="/forgot-password"

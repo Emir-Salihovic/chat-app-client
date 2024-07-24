@@ -43,7 +43,9 @@ export default function AuthLayout() {
     if (authenticated) {
       fetchLogedInUser();
 
-      navigate(location.pathname, { replace: true });
+      if (location.pathname !== "/login") {
+        navigate(location.pathname, { replace: true });
+      }
       return;
     }
   }, [navigate, authenticated]);

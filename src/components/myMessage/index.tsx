@@ -1,4 +1,5 @@
 import useAuthStore, { AuthState } from "../../store/authStore";
+import DefaultAvatar from "../../assets/default-avatar.png";
 
 type MyMessageProps = {
   isUserOnline: boolean;
@@ -16,7 +17,7 @@ const MyMessage = ({ isUserOnline, roomMessage }: MyMessageProps) => {
       <div className="flex items-end gap-x-2 right-0 lg:right-4 max-w-[100%] lg:max-w-[45%] w-full">
         <div className="w-16 h-14 relative">
           <img
-            src={logedInUser?.avatar}
+            src={logedInUser?.avatar || DefaultAvatar}
             alt="avatar"
             className="h-full w-full rounded-md"
           />
