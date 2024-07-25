@@ -49,7 +49,7 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-[100dvh] bg-gray-100">
       <div className="p-8 bg-white shadow-lg rounded-md max-w-sm w-full">
         <div className="text-center mb-6">
           <div className="text-4xl mb-2 text-center">

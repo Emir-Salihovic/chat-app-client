@@ -1,10 +1,5 @@
 import { useNavigate } from "react-router-dom";
-
-import { socketService as socket } from "../../main";
-import useAuthStore, { AuthState } from "../../store/authStore";
-import { DeleteRoomIcon } from "../../icons";
-import Modal from "../modal";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 type RoomItemProps = {
   room: any;
@@ -18,10 +13,7 @@ const getRoomInitials = (roomName: string) => {
 };
 
 export default function RoomItem({ room }: RoomItemProps) {
-  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
 
   const roomBackgroundSwitcher = useMemo(() => {
     const roomBackgrounds = [
@@ -38,13 +30,6 @@ export default function RoomItem({ room }: RoomItemProps) {
     const backgroundIndex = Math.floor(Math.random() * roomBackgrounds.length);
     return roomBackgrounds[backgroundIndex];
   }, []);
-
-  async function deleteRoom(roomId: string) {
-    socket.emit("deleteRoom", {
-      userId: logedInUser?._id,
-      roomId,
-    });
-  }
 
   return (
     <>
@@ -67,52 +52,7 @@ export default function RoomItem({ room }: RoomItemProps) {
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-x-2">
-          {logedInUser?._id === room.creator && (
-            <div
-              onClick={() =>
-                setDeleteModalOpen((prevState: boolean) => !prevState)
-              }
-              className="bg-red-500 cursor-pointer text-white text-xs rounded-lg flex items-center justify-center h-[30px] w-[30px]"
-              title="Delete room..."
-            >
-              <button className="py-1 px-3 inline-block">
-                <DeleteRoomIcon />
-              </button>
-            </div>
-          )}
-        </div>
       </div>
-      <Modal
-        open={deleteModalOpen}
-        toggleModal={() =>
-          setDeleteModalOpen((prevState: boolean) => !prevState)
-        }
-      >
-        <div>
-          <h3 className="font-semibold">
-            Are you sure you want to delete this room?
-          </h3>
-
-          <div className="flex items-center justify-center gap-x-4 mt-4">
-            <button
-              className="bg-blue-500 text-white py-1 px-2 rounded-lg w-[100px]"
-              onClick={() =>
-                setDeleteModalOpen((prevState: boolean) => !prevState)
-              }
-            >
-              No
-            </button>
-            <button
-              className="bg-red-500 text-white py-1 px-2 rounded-lg w-[100px]"
-              onClick={() => deleteRoom(room._id)}
-            >
-              Yes
-            </button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 }

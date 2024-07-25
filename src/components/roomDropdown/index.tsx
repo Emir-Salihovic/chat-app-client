@@ -3,6 +3,7 @@ import useAuthStore, { AuthState } from "../../store/authStore";
 import SocketService from "../../services/socketService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchJoinedRooms } from "../../services/roomService";
+import Modal from "../modal";
 
 type RoomDropdownProps = {
   room: any;
@@ -16,6 +17,7 @@ const isRoomJoined = (roomId: string, roomsJoined: any) => {
 export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
 
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
   const { data: roomsJoined, isLoading: isRoomsJoinedLoading } = useQuery({
@@ -38,6 +40,16 @@ export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
 
     setIsOpen(false);
     queryClient.invalidateQueries({ queryKey: ["rooms-joined"] });
+  }
+
+  async function deleteRoom(roomId: string) {
+    SocketService.emit("deleteRoom", {
+      userId: logedInUser?._id,
+      roomId,
+    });
+
+    setIsOpen(false);
+    setDeleteModalOpen(false);
   }
 
   if (!showOptions) return null;
@@ -96,7 +108,6 @@ export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
               role="none"
               onClick={() => leaveRoom(room._id)}
             >
-              {/* Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" */}
               <button
                 className="block px-4 py-2 text-sm"
                 role="menuitem"
@@ -107,8 +118,56 @@ export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
               </button>
             </div>
           )}
+          {logedInUser?._id === room.creator && (
+            <div
+              onClick={() =>
+                setDeleteModalOpen((prevState: boolean) => !prevState)
+              }
+              className="py-1 cursor-pointer"
+              title="Delete room..."
+              role="none"
+            >
+              <button
+                className="block px-4 py-2 text-sm text-red-500"
+                role="menuitem"
+                tabIndex={-1}
+                id="menu-item-0"
+              >
+                Delete Room
+              </button>
+            </div>
+          )}
         </div>
       )}
+      <Modal
+        open={deleteModalOpen}
+        toggleModal={() =>
+          setDeleteModalOpen((prevState: boolean) => !prevState)
+        }
+      >
+        <div>
+          <h3 className="font-semibold">
+            Are you sure you want to delete this room?
+          </h3>
+
+          <div className="flex items-center justify-center gap-x-4 mt-4">
+            <button
+              className="bg-blue-500 text-white py-1 px-2 rounded-lg w-[100px]"
+              onClick={() =>
+                setDeleteModalOpen((prevState: boolean) => !prevState)
+              }
+            >
+              No
+            </button>
+            <button
+              className="bg-red-500 text-white py-1 px-2 rounded-lg w-[100px]"
+              onClick={() => deleteRoom(room._id)}
+            >
+              Yes
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

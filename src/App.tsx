@@ -12,7 +12,7 @@ function App() {
   };
 
   return (
-    <main className="bg-container h-screen flex items-center p-0 lg:p-4">
+    <main className="bg-container h-[100dvh] flex items-center p-0 lg:p-4">
       <Sidebar toggleModal={toggleModal} />
 
       <div className="w-full lg:w-[94%] h-full bg-whitePrimary text-black">
