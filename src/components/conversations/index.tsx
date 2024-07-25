@@ -16,7 +16,7 @@ export default function Conversations({
   const { data } = useQuery({ queryKey: ["rooms"], queryFn: fetchRooms });
 
   return (
-    <div className="w-[17%] md:w-[30%] h-full p-2 overflow-y-scroll">
+    <div className="w-[17%] md:w-[30%] h-full p-2 overflow-y-scroll mt-24 lg:mt-0">
       {data?.rooms.map((room: any) => {
         return <RoomItem key={room._id} room={room} />;
       })}

@@ -1,16 +1,19 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import Logo from "../../assets/chat.png";
-import { AddRoomIcon, AllChatsIcon, LogoutIcon } from "../../icons";
+import { AddRoomIcon, DrawerIcon, LogoutIcon } from "../../icons";
 import { logout } from "../../services/authService";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { socketService as socket } from "../../main";
+import { Dispatch, SetStateAction } from "react";
 
 type SidebarProps = {
   toggleModal: () => void;
+  isMobile: boolean;
+  setIsMobile: Dispatch<SetStateAction<boolean>>;
 };
 
-function Sidebar({ toggleModal }: SidebarProps) {
+function Sidebar({ toggleModal, isMobile, setIsMobile }: SidebarProps) {
   const navigate = useNavigate();
   const params = useParams();
 
@@ -52,34 +55,66 @@ function Sidebar({ toggleModal }: SidebarProps) {
   }
 
   return (
-    <div className="h-full w-[6%] hidden lg:block px-4 mr-4">
-      <div className="flex h-full flex-col items-center">
-        <div className="h-10 w-10">
-          <img src={Logo} alt="Logo" className="h-full" />
-        </div>
+    <>
+      <div className="h-full w-[6%] hidden lg:block px-4 mr-4">
+        <div className="flex h-full flex-col items-center">
+          <div className="h-10 w-10">
+            <img src={Logo} alt="Logo" className="h-full" />
+          </div>
 
-        <div className="mt-8 h-full relative text-white">
-          <div className="flex flex-col items-center gap-y-[3px] cursor-pointer">
-            <AllChatsIcon />
-            <p className="text-[10px] font-thin">Chats</p>
-          </div>
-          <div
-            className="flex flex-col items-center gap-y-[3px] cursor-pointer mt-4"
-            onClick={toggleModal}
-          >
-            <AddRoomIcon />
-            <p className="text-[10px] font-thin">Add Room</p>
-          </div>
-          <div
-            onClick={handleLogout}
-            className="flex flex-col items-center gap-y-[3px] cursor-pointer absolute bottom-2"
-          >
-            <LogoutIcon />
-            <button className="text-xs font-thin">Logout</button>
+          <div className="mt-8 h-full relative text-white">
+            <div
+              className="flex flex-col items-center gap-y-[3px] cursor-pointer"
+              onClick={toggleModal}
+            >
+              <AddRoomIcon />
+              <p className="text-[10px] font-thin">Add Room</p>
+            </div>
+            <div
+              onClick={handleLogout}
+              className="flex flex-col items-center gap-y-[3px] cursor-pointer absolute bottom-2"
+            >
+              <LogoutIcon />
+              <button className="text-xs font-thin">Logout</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {!isMobile ? (
+        <div
+          className="absolute top-4 left-4 lg:hidden"
+          onClick={() => setIsMobile(true)}
+        >
+          <button>
+            <DrawerIcon />
+          </button>
+        </div>
+      ) : (
+        <div className="h-full w-[40%] md:w-[30%] lg:hidden px-4 absolute bg-black left-0 transition-all z-[3000]">
+          <div className="flex h-full flex-col items-center py-8">
+            <div className="h-14 w-14">
+              <img src={Logo} alt="Logo" className="h-full" />
+            </div>
+
+            <div className="mt-8 h-full relative text-white flex flex-col items-center gap-y-4">
+              <div
+                className="flex flex-col items-center gap-y-[3px] cursor-pointer"
+                onClick={toggleModal}
+              >
+                <p className="text-sm font-thin">Add Room</p>
+              </div>
+
+              <div
+                onClick={handleLogout}
+                className="flex flex-col items-center gap-y-[3px] cursor-pointer"
+              >
+                <button className="text-sm font-thin">Logout</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
