@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { socketService as socket } from "../../main";
 import { toast } from "react-toastify";
 
@@ -14,6 +14,8 @@ type MessageInputProps = {
 const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
   const [message, setMessage] = useState("");
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   const sendMessageMutation = useMutation({
     mutationKey: ["send-message"],
@@ -39,7 +41,22 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
   const disabled = sendMessageMutation.isPending;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
+    const value = e.target.value;
+    setMessage(value);
+
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("userStartedTyping", { userId: logedInUser?._id });
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      socket.emit("userStoppedTyping", { userId: logedInUser?._id });
+    }, 1000); // Adjust the delay as needed
   };
 
   const handleSend = async () => {

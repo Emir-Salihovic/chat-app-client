@@ -16,6 +16,7 @@ import GuestMessage from "../guestMesage";
 import { getRoomMessages } from "../../services/messageService";
 import RoomHeading from "../roomHeading";
 import notificationSound from "../../assets/notification.mp3";
+import TypingUsers from "../typingUsers";
 
 let deletedRoomTimeout: any;
 let scrollTimeout: any;
@@ -26,6 +27,10 @@ export default function ActiveConversation() {
   const navigate = useNavigate();
   const params = useParams();
 
+  const [typingUsers, setTypingUsers] = useState<
+    { userId: string; message: string }[]
+  >([]);
+  console.log("typingUsers", typingUsers);
   const [memberJoinedMessages, setMemberJoinedMessages] = useState<string[]>(
     []
   );
@@ -128,6 +133,28 @@ export default function ActiveConversation() {
     }, 2000);
   };
 
+  const handleUserIsTyping = (message: { userId: string; message: string }) => {
+    // console.log("message", message);
+    setTypingUsers((prevState) => {
+      return [...prevState, message];
+    });
+  };
+
+  const handleUserStoppedTyping = (message: {
+    userId: string;
+    message: string;
+  }) => {
+    // console.log("message", message);
+    const updatedTypingUsers = [...typingUsers];
+    const stoppedTypingUserIndex = updatedTypingUsers.findIndex(
+      (user) => user.userId === message.userId
+    );
+
+    updatedTypingUsers.splice(stoppedTypingUserIndex, 1);
+
+    setTypingUsers(updatedTypingUsers);
+  };
+
   useSocket({
     userLeftRoom: handleUserLeftRoomMessage,
     userChangedRoom: handleUserChangedRoom,
@@ -135,6 +162,8 @@ export default function ActiveConversation() {
     message: handleMemberJoinedMessage,
     messageReceived: handleReceivedMessage,
     roomDeleted: handleRoomDeletedMessage,
+    userIsTyping: handleUserIsTyping,
+    userIsNotTyping: handleUserStoppedTyping,
   });
 
   useEffect(() => {
@@ -215,6 +244,7 @@ export default function ActiveConversation() {
           &nbsp;
         </div>
       </div>
+      <TypingUsers users={typingUsers} />
       {hasBecomeMember && <MessageInput roomId={params.roomId} />}
     </div>
   );

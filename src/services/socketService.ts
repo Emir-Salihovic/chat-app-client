@@ -6,7 +6,7 @@ class SocketService {
   private _socket: Socket; // Change property name and keep it private
 
   private constructor() {
-    this._socket = io(import.meta.env.VITE_SOCKET_IO_PROD_SERVER);
+    this._socket = io(import.meta.env.VITE_SOCKET_IO_SERVER);
 
     this._socket.on("connect", () => {
       console.log("Connected to server");
