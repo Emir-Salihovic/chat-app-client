@@ -206,7 +206,7 @@ export default function ActiveConversation() {
         membersCount={roomMembersCount?.roomMembersCount}
         onlineMembers={roomOnlineMembers?.onlineMembers?.length}
         room={singleRoomData?.room}
-        showOptions={hasBecomeMember}
+        showOptions={true}
       />
 
       <RoomJoinedMessage

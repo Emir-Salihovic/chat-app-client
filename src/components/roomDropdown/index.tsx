@@ -1,20 +1,27 @@
 import { useState } from "react";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import SocketService from "../../services/socketService";
-import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchJoinedRooms } from "../../services/roomService";
 
 type RoomDropdownProps = {
   room: any;
   showOptions: boolean;
 };
 
+const isRoomJoined = (roomId: string, roomsJoined: any) => {
+  return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);
+};
+
 export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
+  const { data: roomsJoined, isLoading: isRoomsJoinedLoading } = useQuery({
+    queryKey: ["rooms-joined"],
+    queryFn: fetchJoinedRooms,
+  });
 
   async function leaveRoom(roomId: string) {
     console.log("leaving room...");
@@ -22,7 +29,15 @@ export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
 
     setIsOpen(false);
     queryClient.invalidateQueries({ queryKey: ["rooms-joined"] });
-    navigate("/rooms");
+  }
+
+  const roomAlreadyJoined = isRoomJoined(room?._id, roomsJoined);
+
+  async function joinRoom(roomId: string) {
+    SocketService.emit("joinRoom", { userId: logedInUser?._id, roomId });
+
+    setIsOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["rooms-joined"] });
   }
 
   if (!showOptions) return null;
@@ -60,21 +75,38 @@ export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
           aria-labelledby="menu-button"
           tabIndex={-1}
         >
-          <div
-            className="py-1 cursor-pointer"
-            role="none"
-            onClick={() => leaveRoom(room._id)}
-          >
-            {/* Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" */}
-            <button
-              className="block px-4 py-2 text-sm"
-              role="menuitem"
-              tabIndex={-1}
-              id="menu-item-0"
+          {!roomAlreadyJoined && !isRoomsJoinedLoading ? (
+            <div
+              className="py-1 cursor-pointer"
+              role="none"
+              onClick={() => joinRoom(room._id)}
             >
-              Leave Room
-            </button>
-          </div>
+              <button
+                className="block px-4 py-2 text-sm"
+                role="menuitem"
+                tabIndex={-1}
+                id="menu-item-0"
+              >
+                Join Room
+              </button>
+            </div>
+          ) : (
+            <div
+              className="py-1 cursor-pointer"
+              role="none"
+              onClick={() => leaveRoom(room._id)}
+            >
+              {/* Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" */}
+              <button
+                className="block px-4 py-2 text-sm"
+                role="menuitem"
+                tabIndex={-1}
+                id="menu-item-0"
+              >
+                Leave Room
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

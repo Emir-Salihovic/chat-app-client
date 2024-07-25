@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 
-import { useQuery } from "@tanstack/react-query";
-import { fetchJoinedRooms } from "../../services/roomService";
 import { socketService as socket } from "../../main";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { DeleteRoomIcon } from "../../icons";
@@ -10,10 +8,6 @@ import { useMemo, useState } from "react";
 
 type RoomItemProps = {
   room: any;
-};
-
-const isRoomJoined = (roomId: string, roomsJoined: any) => {
-  return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);
 };
 
 const getRoomInitials = (roomName: string) => {
@@ -28,10 +22,6 @@ export default function RoomItem({ room }: RoomItemProps) {
   const navigate = useNavigate();
 
   const logedInUser = useAuthStore((state: AuthState) => state.logedInUser);
-  const { data: roomsJoined, isLoading: isRoomsJoinedLoading } = useQuery({
-    queryKey: ["rooms-joined"],
-    queryFn: fetchJoinedRooms,
-  });
 
   const roomBackgroundSwitcher = useMemo(() => {
     const roomBackgrounds = [
@@ -48,12 +38,6 @@ export default function RoomItem({ room }: RoomItemProps) {
     const backgroundIndex = Math.floor(Math.random() * roomBackgrounds.length);
     return roomBackgrounds[backgroundIndex];
   }, []);
-
-  const roomAlreadyJoined = isRoomJoined(room._id, roomsJoined);
-
-  async function joinRoom(roomId: string) {
-    socket.emit("joinRoom", { userId: logedInUser?._id, roomId });
-  }
 
   async function deleteRoom(roomId: string) {
     socket.emit("deleteRoom", {
@@ -95,20 +79,6 @@ export default function RoomItem({ room }: RoomItemProps) {
             >
               <button className="py-1 px-3 inline-block">
                 <DeleteRoomIcon />
-              </button>
-            </div>
-          )}
-
-          {!roomAlreadyJoined && !isRoomsJoinedLoading && (
-            <div
-              className="bg-messageContainerSender text-white text-xs rounded-lg flex items-center justify-center h-[30px] w-[30px]"
-              title="Join room..."
-            >
-              <button
-                onClick={() => joinRoom(room._id)}
-                className="py-1 px-3 inline-block"
-              >
-                +
               </button>
             </div>
           )}
