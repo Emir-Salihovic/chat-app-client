@@ -118,7 +118,7 @@ export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {
               </button>
             </div>
           )}
-          {logedInUser?._id === room.creator && (
+          {logedInUser?._id === room?.creator && (
             <div
               onClick={() =>
                 setDeleteModalOpen((prevState: boolean) => !prevState)

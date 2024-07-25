@@ -1,9 +1,12 @@
 export default function ActivityIndicator() {
   return (
-    <div role="status" className="absolute top-[45%] left-1/2">
+    <div
+      role="status"
+      className="h-[100dvh] w-[100dvw] flex items-center justify-center"
+    >
       <svg
         aria-hidden="true"
-        className="w-12 h-12 text-gray-200 animate-spin fill-messageContainerSender"
+        className="w-6 h-6 md:h-10 md:w-10 lg:h-12 lg:w-12 text-gray-200 animate-spin fill-messageContainerSender"
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

@@ -81,7 +81,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
 
   return (
     <div
-      className={`flex items-center bg-messageContainerGuest rounded-full px-4 py-2 w-[64%] fixed bottom-6 left-[34%] ${
+      className={`flex items-center bg-messageContainerGuest rounded-full px-4 py-2 fixed w-[90%] bottom-4  left-[5%] ${
         disabled ? "text-gray-300" : "text-gray-800"
       }`}
     >
