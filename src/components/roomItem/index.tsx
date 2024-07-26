@@ -45,11 +45,8 @@ export default function RoomItem({ room }: RoomItemProps) {
             <p className="text-lg">{getRoomInitials(room.name)}</p>
           </div>
 
-          <div className="hidden md:flex flex-col">
+          <div className="hidden md:flex flex-col justify-center">
             <h6 className="font-semibold">{room.name}</h6>
-            <p className="text-black font-light text-xs">
-              Jessie rollins sent...
-            </p>
           </div>
         </div>
       </div>
