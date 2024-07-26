@@ -1,9 +1,8 @@
+import { Room } from "../../types";
 import RoomDropdown from "../roomDropdown";
 
 type RoomHeadingProps = {
-  room: {
-    name: string;
-  };
+  room: Room;
   membersCount: number;
   onlineMembers: number;
   showOptions: boolean;
