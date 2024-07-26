@@ -17,9 +17,10 @@ import { getRoomMessages } from "../../services/messageService";
 import RoomHeading from "../roomHeading";
 import notificationSound from "../../assets/notification.mp3";
 import TypingUsers from "../typingUsers";
+import { RoomMember, RoomMessage } from "../../types";
 
-let deletedRoomTimeout: any;
-let scrollTimeout: any;
+let deletedRoomTimeout: ReturnType<typeof setTimeout>;
+let scrollTimeout: ReturnType<typeof setTimeout>;
 
 export default function ActiveConversation() {
   const queryClient = useQueryClient();
@@ -216,9 +217,9 @@ export default function ActiveConversation() {
       />
 
       <div className="flex flex-col relative min-h-[85%] max-h-[85%] overflow-y-scroll">
-        {roomMessages?.roomMessages.map((roomMessage: any) => {
+        {roomMessages?.roomMessages.map((roomMessage: RoomMessage) => {
           const isUserOnline = roomOnlineMembers?.onlineMembers.find(
-            (member: any) => member.userId === roomMessage.userId._id
+            (member: RoomMember) => member.userId === roomMessage.userId._id
           );
 
           if (roomMessage.userId._id === logedInUser?._id) {

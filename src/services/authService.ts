@@ -1,15 +1,5 @@
+import { AuthCredentials } from "../types";
 import { instance as axios } from "./index";
-
-export type AuthCredentials = {
-  username: string;
-  password: string;
-};
-
-export type User = {
-  _id: string;
-  username: string;
-  avatar: string;
-};
 
 export async function login(data: AuthCredentials) {
   const response = await axios.post(`/users/login`, data);

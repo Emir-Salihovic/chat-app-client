@@ -4,14 +4,20 @@ import SocketService from "../../services/socketService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchJoinedRooms } from "../../services/roomService";
 import Modal from "../modal";
+import { Room, RoomMember } from "../../types";
 
 type RoomDropdownProps = {
-  room: any;
+  room: Room;
   showOptions: boolean;
 };
 
-const isRoomJoined = (roomId: string, roomsJoined: any) => {
-  return roomsJoined?.roomsJoined.some((room: any) => room.roomId === roomId);
+const isRoomJoined = (
+  roomId: string,
+  roomsJoined: { roomsJoined: RoomMember[] }
+) => {
+  return roomsJoined?.roomsJoined.some(
+    (room: RoomMember) => room.roomId === roomId
+  );
 };
 
 export default function RoomDropdown({ room, showOptions }: RoomDropdownProps) {

@@ -3,15 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { useMutation } from "@tanstack/react-query";
-import { AuthCredentials, login } from "../../services/authService";
-
-type MyErrorResponse = {
-  response: {
-    data: {
-      message: string;
-    };
-  };
-};
+import { login } from "../../services/authService";
+import { AuthCredentials, MyErrorResponse } from "../../types";
 
 const LoginForm: React.FC = () => {
   const setLogedInUser = useAuthStore(

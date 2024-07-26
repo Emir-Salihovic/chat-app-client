@@ -6,6 +6,7 @@ import { logout } from "../../services/authService";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { socketService as socket } from "../../main";
 import { Dispatch, SetStateAction } from "react";
+import { MyErrorResponse } from "../../types";
 
 type SidebarProps = {
   toggleModal: () => void;
@@ -40,7 +41,7 @@ function Sidebar({ toggleModal, isMobile, setIsMobile }: SidebarProps) {
         roomId: params?.roomId,
       });
     },
-    onError(err: any) {
+    onError(err: MyErrorResponse) {
       console.error("err while loging out", err);
     },
   });

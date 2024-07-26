@@ -18,7 +18,7 @@ export default function RoomJoinedMessage({
   }, [messages]);
 
   useEffect(() => {
-    const timers: any = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     visibleMessages.forEach((_, index) => {
       const timer = setTimeout(() => {

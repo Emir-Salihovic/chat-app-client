@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/chat.png";
 import { useMutation } from "@tanstack/react-query";
-import { AuthCredentials, signup } from "../../services/authService";
+import { signup } from "../../services/authService";
 import useAuthStore, { AuthState } from "../../store/authStore";
+import { AuthCredentials } from "../../types";
 
 type MyErrorResponse = {
   response: {

@@ -6,6 +6,7 @@ import { SendMessageIcon } from "../../icons";
 import { sendMessage } from "../../services/messageService";
 import useAuthStore, { AuthState } from "../../store/authStore";
 import { useMutation } from "@tanstack/react-query";
+import { MyErrorResponse } from "../../types";
 
 type MessageInputProps = {
   roomId: string | undefined;
@@ -26,12 +27,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ roomId }) => {
       socket.emit("messageSent", { userId: logedInUser?._id, roomId, message });
     },
 
-    onError(err: any) {
+    onError(err: MyErrorResponse) {
       console.error("There was a problem with sending the message...", err);
 
       // Rate limiting error
       if (err.response.status === 429) {
-        toast.error(err.response.data);
+        toast.error(!err.response.data);
       }
 
       setMessage("");

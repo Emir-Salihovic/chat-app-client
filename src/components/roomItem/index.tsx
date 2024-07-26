@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
+import { Room } from "../../types";
 
 type RoomItemProps = {
-  room: any;
+  room: Room;
 };
 
 const getRoomInitials = (roomName: string) => {
